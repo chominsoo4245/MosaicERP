@@ -1,0 +1,6 @@
+rootProject.name = 'MosaicERP'
+
+include("authService")
+include("userService")
+include("gateway")
+//include("common-lib")
