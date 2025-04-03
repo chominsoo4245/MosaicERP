@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtProvider.validateToken(token) || redisUserTokenService.isBlacklisted(token)) {
                 String username = jwtProvider.extractUsername(token);
                 CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
-                if(userDetails.getUser().getUserStatus().equals(UserStatus.ACTIVE)) {
+                if(userDetails.getUser().getUserStatus().getStatusCode().equals("ACTIVE")) {
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(auth);

@@ -54,9 +54,9 @@ public class AuthController {
             throw new RuntimeException("Invalid refresh token");
         }
 
-        String role = userRepository.findByUsername(username)
+        String role = userRepository.findByLoginId(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"))
-                .getRole();
+                .getUserRole().getName();
 
         String newAccessToken = jwtProvider.generateAccessToken(username, role);
         return new TokenResponse(newAccessToken, uuid);

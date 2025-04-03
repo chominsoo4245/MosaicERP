@@ -5,12 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "tb_user_status")
+@Table(name = "tb_auth_role")
 @Getter
 @NoArgsConstructor
-public class UserStatus {
+public class UserRole {
     @Id
-    private String statusCode;
+    private long id;
 
+    private String name;
     private String description;
 }
