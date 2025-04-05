@@ -21,9 +21,9 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
-    private Role roleId;
+    private Role role;
 
     @ManyToOne
     @JoinColumn(name = "status_code", nullable = false)
-    private UserStatus userStatusId;
+    private UserStatus userStatus;
 }

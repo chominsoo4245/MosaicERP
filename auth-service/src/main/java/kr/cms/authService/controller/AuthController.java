@@ -3,7 +3,7 @@ package kr.cms.authService.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.cms.authService.dto.TokenRequest;
 import kr.cms.authService.dto.UserRequest;
-import kr.cms.authService.dto.ApiResponse;
+import kr.cms.common.dto.ApiResponse;
 import kr.cms.authService.exception.InvalidTokenException;
 import kr.cms.authService.service.TokenService;
 import kr.cms.common.dto.TokenResponse;

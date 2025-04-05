@@ -1,4 +1,4 @@
-package kr.cms.authService.dto;
+package kr.cms.loginService.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

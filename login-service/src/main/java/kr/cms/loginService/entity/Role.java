@@ -12,5 +12,6 @@ import lombok.Setter;
 @Setter
 public class Role {
     @Id
-    private String statusCode;
+    private Long id;
+    private String name;
 }

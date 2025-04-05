@@ -1,6 +1,6 @@
 package kr.cms.authService.service;
 
-import kr.cms.authService.dto.ApiResponse;
+import kr.cms.common.dto.ApiResponse;
 import kr.cms.authService.dto.TokenRequest;
 import kr.cms.authService.dto.UserRequest;
 import kr.cms.authService.exception.InvalidTokenException;

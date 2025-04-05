@@ -12,7 +12,5 @@ import lombok.Setter;
 @Setter
 public class UserStatus {
     @Id
-    private int id;
-
     private String statusCode;
 }
