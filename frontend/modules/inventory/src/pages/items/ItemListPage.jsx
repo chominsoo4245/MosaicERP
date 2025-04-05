@@ -1,7 +1,7 @@
 import PageLayout from "../../components/Layout/PageLayout.jsx";
 import ButtonLayout from "../../components/Layout/ButtonLayout.jsx";
 import {useCallback, useState} from "react";
-import ItemRow from "../../components/ItemRow.jsx";
+import ItemRow from "./ItemRow.jsx";
 import {useNavigate} from "react-router-dom";
 
 

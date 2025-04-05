@@ -14,10 +14,6 @@ const menus = [
                 label: "품목 등록",
                 path: "/items/register"
             },
-            {
-                label: "품목 수정",
-                path: "/items/update"
-            },
         ]
     },
     {

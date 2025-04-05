@@ -1,0 +1,28 @@
+services:
+  user-db:
+    image: postgres:15
+    container_name: cms-user-db
+    environment:
+      POSTGRES_DB: cms_user_db
+      POSTGRES_USER: cms_user
+      POSTGRES_PASSWORD: cms_user_pw
+    ports:
+      - "5432:5432"
+    volumes:
+      - cms_user_data:/var/lib/postgresql/data
+
+  inventory-db:
+    image: postgres:15
+    container_name: cms-inventory-db
+    environment:
+      POSTGRES_DB: cms_inventory_db
+      POSTGRES_USER: cms_inventory
+      POSTGRES_PASSWORD: cms_inventory_pw
+    ports:
+      - "5433:5432"
+    volumes:
+      -  cms_inventory_data:/var/lib/postgresql/data
+
+volumes:
+  cms_user_data:
+  cms_inventory_data:
