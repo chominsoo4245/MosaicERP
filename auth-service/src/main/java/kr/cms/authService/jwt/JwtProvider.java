@@ -13,7 +13,6 @@ import java.util.Date;
 public class JwtProvider {
     private final String secretKey = "secretsecretsecretsecretsecretsecret";
     private final long accessExpirationMs = 1000L * 60 * 15; // 15분
-    private final long refreshExpirationHs = 1000L * 60 * 60 * 24 * 7; // 7일
 
     public String generateAccessToken(String username, String role) {
         return Jwts.builder()
@@ -25,32 +24,27 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String extractUsername(String token) {
-        return Jwts.parserBuilder().setSigningKey(getKey()).build()
-                .parseClaimsJws(token).getBody().getSubject();
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            System.out.println("jwtValidateToken:" + e);
-            return false;
-        }
-    }
-
     private Key getKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public long getExpiration(String token) {
-        Claims claims = Jwts.parserBuilder()
+    public Claims getClaims(String token) {
+        return Jwts.parserBuilder()
                 .setSigningKey(getKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public long getExpiration(String token) {
+        Claims claims = getClaims(token);
 
         return claims.getExpiration().getTime();
+    }
+
+    public String getRoleFromAccessToken(String token) {
+        Claims claims = getClaims(token);
+
+        return claims.get("role", String.class);
     }
 }

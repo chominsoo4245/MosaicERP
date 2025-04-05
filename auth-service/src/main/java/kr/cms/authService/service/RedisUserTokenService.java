@@ -15,14 +15,14 @@ public class RedisUserTokenService {
     private static final String REFRESH_PREFIX = "refresh:";
     private static final String BLACKLIST_PREFIX = "blacklist:";
 
-    public String saveRefreshToken(String username){
+    public String saveRefreshToken(String loginId){
         String uuid = UUID.randomUUID().toString();
         String key = REFRESH_PREFIX + uuid;
-        redisTemplate.opsForValue().set(key, username, REFRESH_TOKEN_EXPIRATION);
+        redisTemplate.opsForValue().set(key, loginId, REFRESH_TOKEN_EXPIRATION);
         return uuid;
     }
 
-    public String getUsernameFromRefreshToken(String uuid){
+    public String getLoginIdFromRefreshToken(String uuid){
         return redisTemplate.opsForValue().get(REFRESH_PREFIX + uuid);
     }
 
