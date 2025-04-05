@@ -1,55 +1,61 @@
 package kr.cms.authService.controller;
 
-import kr.cms.authService.dto.*;
-import kr.cms.authService.jwt.JwtProvider;
-import kr.cms.authService.service.RedisUserTokenService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.cms.authService.dto.TokenRequest;
+import kr.cms.authService.dto.UserRequest;
+import kr.cms.authService.dto.ApiResponse;
+import kr.cms.authService.exception.InvalidTokenException;
+import kr.cms.authService.service.TokenService;
 import kr.cms.common.dto.TokenResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
+@Tag(name = "인증 API", description = "JWT 토큰 발급, 갱신, 폐기 API")
 public class AuthController {
-    private final JwtProvider jwtProvider;
-    private final RedisUserTokenService rutService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private final TokenService tokenService;
 
     @PostMapping("/issue")
-    public TokenResponse login(@RequestBody LoginRequest loginRequest) {
-        String accessToken = jwtProvider.generateAccessToken(loginRequest.getLoginId(), loginRequest.getRole());
-        String refreshToken = rutService.saveRefreshToken(loginRequest.getLoginId());
-
-        return new TokenResponse(accessToken, refreshToken);
-    }
-    @PostMapping("/refresh")
-    public TokenResponse refresh(@RequestBody RefreshTokenRequest request) {
-        String oldRefreshToken = request.getRefreshToken();
-        String accessToken = request.getAccessToken();
-
-        String loginId = rutService.getLoginIdFromRefreshToken(oldRefreshToken);
-        if (loginId == null) {
-            throw new RuntimeException("Invalid refresh token");
+    public ApiResponse<TokenResponse> issue(@RequestBody UserRequest userRequest) {
+        try {
+            return tokenService.issueToken(userRequest);
+        } catch (IllegalArgumentException e) {
+            logger.warn("잘못된 입력 값: {}", e.getMessage());
+            return ApiResponse.fail(e.getMessage());
+        } catch (Exception e) {
+            logger.error("토큰 발급 중 서버 오류", e);
+            return ApiResponse.fail("토큰 발급 중 서버 오류가 발생했습니다.");
         }
+    }
 
-        rutService.deleteRefreshToken(oldRefreshToken);
-        String role = jwtProvider.getRoleFromAccessToken(accessToken);
-
-        String newAccessToken = jwtProvider.generateAccessToken(loginId, role);
-        String newRefreshToken = rutService.saveRefreshToken(loginId);
-
-        return new TokenResponse(newAccessToken, newRefreshToken);
+    @PostMapping("/refresh")
+    public ApiResponse<TokenResponse> refresh(@RequestBody TokenRequest request) {
+        try {
+            return tokenService.refreshToken(request);
+        } catch (InvalidTokenException e) {
+            logger.warn("유효하지 않은 토큰: {}", e.getMessage());
+            return ApiResponse.fail(e.getMessage());
+        } catch (Exception e) {
+            logger.error("토큰 갱신 중 서버 오류", e);
+            return ApiResponse.fail("토큰 갱신 중 서버 오류가 발생했습니다.");
+        }
     }
 
     @PostMapping("/revoke")
-    public void logout(@RequestBody LogoutRequest logoutRequest) {
-        String refreshUuid = logoutRequest.getRefreshToken();
-        String accessToken = logoutRequest.getAccessToken();
-
-        rutService.deleteRefreshToken(refreshUuid);
-        long expiration = jwtProvider.getExpiration(accessToken);
-        rutService.addToBlacklist(accessToken, expiration);
+    public ApiResponse<String> revoke(@RequestBody TokenRequest request) {
+        try {
+            return tokenService.revokeToken(request);
+        } catch (InvalidTokenException e) {
+            logger.warn("유효하지 않은 토큰 폐기 요청: {}", e.getMessage());
+            return ApiResponse.fail(e.getMessage());
+        } catch (Exception e) {
+            logger.error("토큰 폐기 중 서버 오류", e);
+            return ApiResponse.fail("토큰 폐기 중 서버 오류가 발생했습니다.");
+        }
     }
 }

@@ -22,8 +22,13 @@ public class RedisUserTokenService {
         return uuid;
     }
 
-    public String getLoginIdFromRefreshToken(String uuid){
-        return redisTemplate.opsForValue().get(REFRESH_PREFIX + uuid);
+    public String getLoginIdFromRefreshToken(String uuid, String loginId) {
+        String storedLoginId = redisTemplate.opsForValue().get(REFRESH_PREFIX + uuid);
+        if (storedLoginId != null && storedLoginId.equals(loginId)) {
+            return storedLoginId;
+        }
+
+        return null;
     }
 
     public void deleteRefreshToken(String uuid){

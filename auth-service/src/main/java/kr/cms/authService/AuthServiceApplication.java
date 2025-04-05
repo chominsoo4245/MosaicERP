@@ -6,7 +6,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 
 @SpringBootApplication
-@EnableFeignClients(basePackages = "kr.cms.authService.client")
 public class AuthServiceApplication {
 
     public static void main(String[] args) {
