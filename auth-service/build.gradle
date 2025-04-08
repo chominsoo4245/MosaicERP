@@ -14,6 +14,9 @@ dependencies {
     // common library
     implementation project(':common-dto')
 
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'

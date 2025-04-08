@@ -21,6 +21,14 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
+    public static <T> ApiResponse<T> successWithMessage(String message){
+        ApiResponse<T> res = new ApiResponse<>();
+        res.success = true;
+        res.message = message;
+        res.data = null;
+        return res;
+    }
+
     public boolean isSuccess() {
         return success;
     }

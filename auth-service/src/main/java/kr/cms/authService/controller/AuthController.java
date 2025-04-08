@@ -21,9 +21,14 @@ public class AuthController {
     private final TokenService tokenService;
 
     @PostMapping("/issue")
-    public ApiResponse<TokenResponse> issue(@RequestBody UserRequest userRequest) {
+    public ApiResponse<TokenResponse> issue(
+            @RequestBody UserRequest userRequest,
+            @RequestHeader("X-Forwarded-For") String ip,
+            @RequestHeader("X-User-Agent") String userAgent
+    ) {
+        ip = ip.split(",")[0];
         try {
-            return tokenService.issueToken(userRequest);
+            return tokenService.issueToken(userRequest, ip, userAgent);
         } catch (IllegalArgumentException e) {
             logger.warn("잘못된 입력 값: {}", e.getMessage());
             return ApiResponse.fail(e.getMessage());
@@ -34,9 +39,15 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ApiResponse<TokenResponse> refresh(@RequestBody TokenRequest request) {
+    public ApiResponse<TokenResponse> refresh(
+            @RequestBody TokenRequest request,
+            @RequestHeader("X-Forwarded-For") String ip,
+            @RequestHeader("X-User-Agent") String userAgent
+    ) {
+        ip = ip.split(",")[0];
+
         try {
-            return tokenService.refreshToken(request);
+            return tokenService.refreshToken(request, ip, userAgent);
         } catch (InvalidTokenException e) {
             logger.warn("유효하지 않은 토큰: {}", e.getMessage());
             return ApiResponse.fail(e.getMessage());
@@ -47,9 +58,15 @@ public class AuthController {
     }
 
     @PostMapping("/revoke")
-    public ApiResponse<String> revoke(@RequestBody TokenRequest request) {
+    public ApiResponse<String> revoke(
+            @RequestBody TokenRequest request,
+            @RequestHeader("X-Forwarded-For") String ip,
+            @RequestHeader("X-User-Agent") String userAgent
+    ) {
+        ip = ip.split(",")[0];
+
         try {
-            return tokenService.revokeToken(request);
+            return tokenService.revokeToken(request, ip, userAgent);
         } catch (InvalidTokenException e) {
             logger.warn("유효하지 않은 토큰 폐기 요청: {}", e.getMessage());
             return ApiResponse.fail(e.getMessage());

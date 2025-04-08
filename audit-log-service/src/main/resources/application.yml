@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: audit-log-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mosaicerp
+    username: log_service_user
+    password: log_service_pw
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: audit-log-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    properties:
+      spring.json.trusted.packages: "*"
+      spring.json.value.default.type: kr.cms.common.dto.AuditLogDto
+
+server:
+  port: 9101

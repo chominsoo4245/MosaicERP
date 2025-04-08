@@ -6,10 +6,7 @@ import kr.cms.loginService.dto.LoginRequest;
 import kr.cms.loginService.dto.TokenRequest;
 import kr.cms.loginService.service.LoginService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/login-service")
@@ -18,13 +15,16 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping("/login")
-    public ApiResponse<TokenResponse> login(@RequestBody LoginRequest request) {
-        return loginService.login(request);
+    public ApiResponse<TokenResponse> login(@RequestBody LoginRequest request, @RequestHeader("X-Forwarded-For") String ip, @RequestHeader("X-User-Agent") String userAgent) {
+        ip = ip.split(",")[0];
+
+        return loginService.login(request, ip, userAgent);
     }
 
     @PostMapping("/logout")
-    public ApiResponse<String> logout(@RequestBody TokenRequest request) {
-        System.out.println("request:" + request);
-        return loginService.logout(request);
+    public ApiResponse<String> logout(@RequestBody TokenRequest request, @RequestHeader("X-Forwarded-For") String ip, @RequestHeader("X-User-Agent") String userAgent) {
+        ip = ip.split(",")[0];
+
+        return loginService.logout(request, ip, userAgent);
     }
 }

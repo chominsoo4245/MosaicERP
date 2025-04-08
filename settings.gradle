@@ -7,5 +7,10 @@ include("api-gateway")
 include("eureka-server")
 include("login-service")
 
+// log service
+include("access-log-service")
+include("audit-log-service")
+
+
 // auth, login-service, sns-login-service
 include("common-dto")
