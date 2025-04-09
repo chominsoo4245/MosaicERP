@@ -18,6 +18,7 @@ public class InventoryDTO {
     private LocalDateTime expirationDate;
     private Integer currentQuantity;
     private Integer reservedQuantity;
-    private LocalDateTime lastUpdated;
     private int version;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -21,6 +21,11 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        String path = exchange.getRequest().getURI().getPath();
+        if (path.startsWith("/auth/refresh")) {
+            return chain.filter(exchange);
+        }
+
         HttpHeaders headers = exchange.getRequest().getHeaders();
         String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
 

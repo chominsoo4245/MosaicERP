@@ -5,6 +5,7 @@ import kr.cms.common.dto.ApiResponse;
 import kr.cms.common.dto.AuditLogDto;
 import kr.cms.inventoryService.dto.InventoryDTO;
 import kr.cms.inventoryService.dto.InventoryHistoryDTO;
+import kr.cms.inventoryService.dto.InventorySearchParamDTO;
 import kr.cms.inventoryService.dto.InventoryUpdateRequestDTO;
 import kr.cms.inventoryService.entity.Inventory;
 import kr.cms.inventoryService.entity.InventoryHistory;
@@ -54,6 +55,64 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
 
+    @Override
+    public ApiResponse<InventoryDTO> getInventoryDetail(Long inventoryId, String ip, String userAgent, String loginId) {
+        try {
+            Inventory inventory = inventoryRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Inventory not found"));
+            InventoryDTO dto = convertToInventoryDTO(inventory);
+            logSender.sendAuditLog(new AuditLogDto(
+                    "GET_INVENTORY_DETAIL_SUCCESS",
+                    loginId,
+                    "Inventory detail retrieved successfully.",
+                    ip,
+                    userAgent,
+                    LocalDateTime.now()
+            ));
+            return ApiResponse.success(dto);
+        } catch (Exception e) {
+            logSender.sendAuditLog(new AuditLogDto(
+                    "GET_INVENTORY_DETAIL_FAIL",
+                    loginId,
+                    "Error retrieving inventory detail: " + e.getMessage(),
+                    ip,
+                    userAgent,
+                    LocalDateTime.now()
+            ));
+            return ApiResponse.fail(e.getMessage());
+        }
+    }
+
+    @Override
+    public ApiResponse<List<InventoryDTO>> searchInventory(InventorySearchParamDTO searchParam, String ip, String userAgent, String loginId) {
+        try {
+            List<Inventory> list = inventoryRepository.searchByCriteria(searchParam);
+
+            List<InventoryDTO> dtos = list.stream()
+                    .map(this::convertToInventoryDTO)
+                    .collect(Collectors.toList());
+            logSender.sendAuditLog(new AuditLogDto(
+                    "SEARCH_INVENTORY_SUCCESS",
+                    loginId,
+                    "Retrieved " + dtos.size() + " inventory records based on search criteria.",
+                    ip,
+                    userAgent,
+                    LocalDateTime.now()
+            ));
+            return ApiResponse.success(dtos);
+        } catch (Exception e) {
+            logSender.sendAuditLog(new AuditLogDto(
+                    "SEARCH_INVENTORY_FAIL",
+                    loginId,
+                    "Error searching inventory: " + e.getMessage(),
+                    ip,
+                    userAgent,
+                    LocalDateTime.now()
+            ));
+            return ApiResponse.fail(e.getMessage());
+        }
+    }
+
     @Transactional
     @Override
     public ApiResponse<InventoryDTO> increaseInventory(InventoryUpdateRequestDTO req, String ip, String userAgent, String loginId) {
@@ -76,13 +135,13 @@ public class InventoryServiceImpl implements InventoryService {
                         newInv.setExpirationDate(expirationDate);
                         newInv.setCurrentQuantity(0);
                         newInv.setReservedQuantity(0);
-                        newInv.setLastUpdated(LocalDateTime.now());
+                        newInv.setUpdatedAt(LocalDateTime.now());
                         return newInv;
                     });
 
             int preQuantity = inventory.getCurrentQuantity();
             inventory.setCurrentQuantity(preQuantity + quantity);
-            inventory.setLastUpdated(LocalDateTime.now());
+            inventory.setUpdatedAt(LocalDateTime.now());
             Inventory saved = inventoryRepository.save(inventory);
 
             createInventoryHistory(itemId, warehouseId, binId, lotNumber, expirationDate,
@@ -132,14 +191,14 @@ public class InventoryServiceImpl implements InventoryService {
                         "DECREASE_INVENTORY_FAIL",
                         loginId,
                         errMsg,
-                        ip, 
+                        ip,
                         userAgent,
                         LocalDateTime.now()
                 ));
                 return ApiResponse.fail(errMsg);
             }
             inventory.setCurrentQuantity(preQuantity - quantity);
-            inventory.setLastUpdated(LocalDateTime.now());
+            inventory.setUpdatedAt(LocalDateTime.now());
             Inventory saved = inventoryRepository.save(inventory);
 
             createInventoryHistory(itemId, warehouseId, binId, lotNumber, expirationDate,
@@ -206,8 +265,9 @@ public class InventoryServiceImpl implements InventoryService {
                 inventory.getExpirationDate(),
                 inventory.getCurrentQuantity(),
                 inventory.getReservedQuantity(),
-                inventory.getLastUpdated(),
-                inventory.getVersion()
+                inventory.getVersion(),
+                inventory.getCreatedAt(),
+                inventory.getUpdatedAt()
         );
     }
 

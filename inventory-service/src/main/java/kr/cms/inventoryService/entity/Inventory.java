@@ -34,9 +34,12 @@ public class Inventory {
     @Column(nullable = false)
     private Integer reservedQuantity;
 
-    @Column(nullable = false)
-    private LocalDateTime lastUpdated = LocalDateTime.now();
-
     @Version
     private int version;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

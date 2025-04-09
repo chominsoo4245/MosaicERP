@@ -21,8 +21,16 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/inventory-service", "/inventory-service/", "/inventory-service/decrease", "/inventory-service/history",
-                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
+                        .requestMatchers(
+                                "/inventory-service",
+                                "/inventory-service/detail/**",
+                                "/inventory-service/search",
+                                "/inventory-service/increase/",
+                                "/inventory-service/decrease",
+                                "/inventory-service/history",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
                         )
                         .permitAll()
                         .anyRequest()
