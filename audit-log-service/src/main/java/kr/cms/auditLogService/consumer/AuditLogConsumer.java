@@ -1,8 +1,10 @@
 package kr.cms.auditLogService.consumer;
 
 import kr.cms.auditLogService.entity.AuthAuditLog;
+import kr.cms.auditLogService.entity.InventoryAuditLog;
 import kr.cms.auditLogService.entity.LoginAuditLog;
 import kr.cms.auditLogService.repository.AuthAuditLogRepository;
+import kr.cms.auditLogService.repository.InventoryAuditLogRepository;
 import kr.cms.auditLogService.repository.LoginAuditLogRepository;
 import kr.cms.common.dto.AuditLogDto;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ public class AuditLogConsumer {
 
     private final AuthAuditLogRepository authAuditLogRepository;
     private final LoginAuditLogRepository loginAuditLogRepository;
+    private final InventoryAuditLogRepository inventoryAuditLogRepository;
 
     @KafkaListener(topics = "auth-audit-log", groupId = "auth-audit-log-group")
     public void consumeAuthAudit(AuditLogDto logDto) {
@@ -62,5 +65,28 @@ public class AuditLogConsumer {
                 .build();
 
         loginAuditLogRepository.save(logEntity);
+    }
+
+    @KafkaListener(topics = "inventory-audit-log", groupId = "inventory-audit-log-group")
+    public void consumeInventoryAudit(AuditLogDto logDto){
+        log.info("[INVENTORY-AUDIT-LOG] {} {} from IP = {} | UA='{}' | message = {} | at {}",
+                logDto.getAction(),
+                logDto.getLoginId(),
+                logDto.getIp(),
+                logDto.getUserAgent(),
+                logDto.getDescription(),
+                logDto.getTimestamp()
+        );
+
+        InventoryAuditLog logEntity = InventoryAuditLog.builder()
+                .loginId(logDto.getLoginId())
+                .action(logDto.getAction())
+                .description(logDto.getDescription())
+                .ip(logDto.getIp())
+                .userAgent(logDto.getUserAgent())
+                .createdAt(logDto.getTimestamp())
+                .build();
+
+        inventoryAuditLogRepository.save(logEntity);
     }
 }
