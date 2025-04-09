@@ -40,12 +40,14 @@ public class TokenService {
         return ApiResponse.success(new TokenResponse(accessToken, refreshToken));
     }
 
-    public ApiResponse<TokenResponse> refreshToken(TokenRequest request, String ip, String userAgent) {
+    public ApiResponse<TokenResponse> refreshToken(TokenRequest request, String ip, String userAgent, String loginId) {
         String accessToken = request.getAccessToken();
         String refreshToken = request.getRefreshToken();
 
         try {
-            String loginId = validateAndHandleInvalidToken(accessToken, refreshToken, ip, userAgent);
+            redisService.deleteRefreshToken(refreshToken);
+            redisService.addToBlacklist(accessToken, jwtProvider.getExpiration(accessToken));
+
             String role = jwtProvider.getRoleFromAccessToken(accessToken);
             String newAccessToken = jwtProvider.generateAccessToken(loginId, role);
             String newRefreshToken = redisService.saveRefreshToken(loginId);
@@ -53,17 +55,16 @@ public class TokenService {
             sendSuccessAudit("REFRESH_TOKEN_SUCCESS", loginId, ip, userAgent);
             return ApiResponse.success(new TokenResponse(newAccessToken, newRefreshToken));
         } catch (InvalidTokenException e) {
+            sendFailAuditInvalidToken("REFRESH_TOKEN_FAIL", loginId, ip, userAgent);
             return ApiResponse.fail(e.getMessage());
         }
     }
 
-    public ApiResponse<String> revokeToken(TokenRequest request, String ip, String userAgent) {
+    public ApiResponse<String> revokeToken(TokenRequest request, String ip, String userAgent, String loginId) {
         String accessToken = request.getAccessToken();
         String refreshToken = request.getRefreshToken();
 
         try {
-            String loginId = validateAndHandleInvalidToken(accessToken, refreshToken, ip, userAgent);
-
             redisService.deleteRefreshToken(refreshToken);
             redisService.addToBlacklist(accessToken, jwtProvider.getExpiration(accessToken));
 
@@ -71,27 +72,9 @@ public class TokenService {
             return ApiResponse.successWithMessage("토큰이 정상적으로 폐기되었습니다.");
         } catch (InvalidTokenException e) {
             redisService.addToBlacklist(accessToken, jwtProvider.getExpiration(accessToken));
+            sendFailAuditInvalidToken("REVOKE_TOKEN_FAIL", loginId, ip, userAgent);
             return ApiResponse.success(e.getMessage());
         }
-    }
-
-    private String validateAndHandleInvalidToken(String accessToken, String refreshToken, String ip, String userAgent) {
-        if (accessToken == null || refreshToken == null) {
-            sendFailAuditEmptyToken("TOKEN_EMPTY", ip, userAgent);
-            throw new InvalidTokenException("토큰이 누락되었습니다.");
-        }
-
-        String loginId = redisService.getLoginIdFromRefreshToken(
-                refreshToken,
-                jwtProvider.extractLoginId(accessToken)
-        );
-
-        if (loginId == null) {
-            sendFailAuditInvalidToken("INVALID_TOKEN", ip, userAgent);
-            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
-        }
-
-        return loginId;
     }
 
     private void sendSuccessAudit(String action, String loginId, String ip, String agent) {
@@ -105,24 +88,13 @@ public class TokenService {
         ));
     }
 
-    private void sendFailAuditInvalidToken(String action, String ip, String userAgent) {
+    private void sendFailAuditInvalidToken(String action, String loginId, String ip, String agent) {
         logProducer.sendAuditLog(new AuditLogDto(
                 action,
-                null,
+                loginId,
                 "유효하지 않은 토큰",
                 ip,
-                userAgent,
-                LocalDateTime.now()
-        ));
-    }
-
-    private void sendFailAuditEmptyToken(String action, String ip, String userAgent) {
-        logProducer.sendAuditLog(new AuditLogDto(
-                action,
-                null,
-                "토큰이 누락되었습니다.",
-                ip,
-                userAgent,
+                agent,
                 LocalDateTime.now()
         ));
     }

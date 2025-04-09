@@ -15,16 +15,25 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping("/login")
-    public ApiResponse<TokenResponse> login(@RequestBody LoginRequest request, @RequestHeader("X-Forwarded-For") String ip, @RequestHeader("X-User-Agent") String userAgent) {
+    public ApiResponse<TokenResponse> login(
+            @RequestBody LoginRequest request,
+            @RequestHeader("X-Forwarded-For") String ip,
+            @RequestHeader("X-User-Agent") String userAgent
+    ) {
         ip = ip.split(",")[0];
 
         return loginService.login(request, ip, userAgent);
     }
 
     @PostMapping("/logout")
-    public ApiResponse<String> logout(@RequestBody TokenRequest request, @RequestHeader("X-Forwarded-For") String ip, @RequestHeader("X-User-Agent") String userAgent) {
+    public ApiResponse<String> logout(
+            @RequestBody TokenRequest request,
+            @RequestHeader("X-Forwarded-For") String ip,
+            @RequestHeader("X-User-Agent") String userAgent,
+            @RequestHeader("X-User-Id") String loginId
+    ) {
         ip = ip.split(",")[0];
 
-        return loginService.logout(request, ip, userAgent);
+        return loginService.logout(request, ip, userAgent, loginId);
     }
 }

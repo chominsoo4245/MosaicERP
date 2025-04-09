@@ -42,12 +42,13 @@ public class AuthController {
     public ApiResponse<TokenResponse> refresh(
             @RequestBody TokenRequest request,
             @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent
+            @RequestHeader("X-User-Agent") String userAgent,
+            @RequestHeader("X-User-Id") String loginId
     ) {
         ip = ip.split(",")[0];
 
         try {
-            return tokenService.refreshToken(request, ip, userAgent);
+            return tokenService.refreshToken(request, ip, userAgent, loginId);
         } catch (InvalidTokenException e) {
             logger.warn("유효하지 않은 토큰: {}", e.getMessage());
             return ApiResponse.fail(e.getMessage());
@@ -61,12 +62,13 @@ public class AuthController {
     public ApiResponse<String> revoke(
             @RequestBody TokenRequest request,
             @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent
+            @RequestHeader("X-User-Agent") String userAgent,
+            @RequestHeader("X-User-Id") String loginId
     ) {
         ip = ip.split(",")[0];
 
         try {
-            return tokenService.revokeToken(request, ip, userAgent);
+            return tokenService.revokeToken(request, ip, userAgent, loginId);
         } catch (InvalidTokenException e) {
             logger.warn("유효하지 않은 토큰 폐기 요청: {}", e.getMessage());
             return ApiResponse.fail(e.getMessage());

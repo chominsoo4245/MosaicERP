@@ -11,12 +11,6 @@ java {
 }
 
 dependencies {
-    // common library
-    implementation project(':common-dto')
-
-    // Kafka
-    implementation 'org.springframework.kafka:spring-kafka'
-
     // Spring Boot 기본
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

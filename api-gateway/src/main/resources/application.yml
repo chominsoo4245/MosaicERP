@@ -42,6 +42,12 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: inventory-service
+          uri: lb://inventory-service
+          predicates:
+            - Path=/inventory-service/**
+
+
 eureka:
   client:
     register-with-eureka: true

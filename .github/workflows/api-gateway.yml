@@ -1,18 +1,18 @@
-name: Build and Test Login Service
+name: Build and Test outbound Service
 
 on:
   push:
     paths:
-      - 'login-service/**'
-      - '.github/workflows/login-service.yml'
+      - 'api-gateway/**'
+      - '.github/workflows/api-gateway.yml'
 
 jobs:
-  build-login:
+  build-gateway:
     runs-on: ubuntu-latest
 
     defaults:
       run:
-        working-directory: login-service
+        working-directory: api-gateway
 
     steps:
       - name: Checkout repository

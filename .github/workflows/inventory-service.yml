@@ -1,18 +1,18 @@
-name: Build and Test Login Service
+name: Build and Test inventory Service
 
 on:
   push:
     paths:
-      - 'login-service/**'
-      - '.github/workflows/login-service.yml'
+      - 'inventory-service/**'
+      - '.github/workflows/inventory-service.yml'
 
 jobs:
-  build-login:
+  build-inventory:
     runs-on: ubuntu-latest
 
     defaults:
       run:
-        working-directory: login-service
+        working-directory: inventory-service
 
     steps:
       - name: Checkout repository

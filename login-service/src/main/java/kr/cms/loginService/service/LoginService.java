@@ -62,7 +62,7 @@ public class LoginService {
         return ApiResponse.success(Objects.requireNonNull(response).getData());
     }
 
-    public ApiResponse<String> logout(TokenRequest tokenRequest, String ip, String userAgent) {
+    public ApiResponse<String> logout(TokenRequest tokenRequest, String ip, String userAgent, String loginId) {
         ParameterizedTypeReference<ApiResponse<String>> typeRef =
                 new ParameterizedTypeReference<>() {
                 };
@@ -72,13 +72,14 @@ public class LoginService {
                 .headers(headers -> {
                     headers.set("X-Forwarded-For", ip);
                     headers.set("X-User-Agent", userAgent);
+                    headers.set("X-User-Id", loginId);
                 })
                 .bodyValue(tokenRequest)
                 .retrieve()
                 .bodyToMono(typeRef)
                 .block();
 
-        sendSuccessAudit("LOGOUT_SUCCESS", tokenRequest.getLoginId(), ip, userAgent);
+        sendSuccessAudit("LOGOUT_SUCCESS", loginId, ip, userAgent);
         return ApiResponse.successWithMessage(Objects.requireNonNull(response).getMessage());
     }
 

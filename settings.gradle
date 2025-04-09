@@ -2,10 +2,14 @@ rootProject.name = 'MosaicERP'
 
 include("auth-service")
 include("user-service")
-include("inventory-service")
 include("api-gateway")
 include("eureka-server")
 include("login-service")
+
+// erp micro service
+include("inbound-service")
+include("inventory-service")
+include("outbound-service")
 
 // log service
 include("access-log-service")
