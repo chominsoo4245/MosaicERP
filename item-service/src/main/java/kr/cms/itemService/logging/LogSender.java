@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 public class LogSender {
 
     private final KafkaTemplate<String, AuditLogDTO> kafkaTemplate;
-    private static final String INVENTORY_AUDIT_LOG = "item-audit-log";
+    private static final String ITEM_AUDIT_LOG = "item-audit-log";
 
     public void sendAuditLog(AuditLogDTO dto){
-        kafkaTemplate.send(INVENTORY_AUDIT_LOG, dto).whenComplete((res, ex) -> {
+        kafkaTemplate.send(ITEM_AUDIT_LOG, dto).whenComplete((res, ex) -> {
             if(ex != null) {
                 log.error("[KAFKA] Audit Log 전송 실패", ex);
             }else {

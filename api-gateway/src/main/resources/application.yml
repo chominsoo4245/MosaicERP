@@ -29,7 +29,14 @@ spring:
             - Path=/user-service/**
           filters:
             - StripPrefix=1
-
+#        - id:
+#          uri:
+#          predicates:
+#            -
+        - id: item-service
+          uri: lb://item-service
+          predicates:
+            - Path=/item-service/**
         - id: inventory-service
           uri: lb://inventory-service
           predicates:

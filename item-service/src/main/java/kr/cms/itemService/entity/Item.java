@@ -3,6 +3,7 @@ package kr.cms.itemService.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -32,10 +33,10 @@ public class Item {
     private String unit;        // 단위 (예: EA, KG 등)
 
     @Column(precision = 10, scale = 2)
-    private Double cost;        // 원가
+    private BigDecimal cost;        // 원가
 
     @Column(precision = 10, scale = 2)
-    private Double price;       // 판매 가격
+    private BigDecimal price;       // 판매 가격
 
     @Column(name = "is_lot_tracked", nullable = false)
     private Boolean isLotTracked = false; // LOT 관리 여부
