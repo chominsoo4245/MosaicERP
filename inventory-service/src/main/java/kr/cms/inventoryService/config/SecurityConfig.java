@@ -24,10 +24,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/inventory-service",
                                 "/inventory-service/detail/**",
-                                "/inventory-service/search",
                                 "/inventory-service/increase/",
                                 "/inventory-service/decrease",
                                 "/inventory-service/history",
+                                "/inventory-service/list",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"

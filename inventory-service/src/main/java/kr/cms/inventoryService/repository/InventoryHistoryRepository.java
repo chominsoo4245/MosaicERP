@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface InventoryHistoryRepository extends JpaRepository<InventoryHistory, Long> {
-    List<InventoryHistory> findByItemIdAndWarehouseIdAndBinIdAndLotNumber(Long itemId, Integer warehouseId, Integer binId, String lotNumber);
+    List<InventoryHistory> findByItemIdAndWarehouseIdAndBinIdAndLotId(Long itemId, Integer warehouseId, Integer binId, Integer lotId);
 }

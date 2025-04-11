@@ -14,8 +14,7 @@ public class InventoryHistoryDTO {
     private Long itemId;
     private Integer warehouseId;
     private Integer binId;
-    private String lotNumber;
-    private LocalDateTime expirationDate;
+    private Integer lotId;
     private String transactionType;
     private Integer quantityChange;
     private Integer preQuantity;

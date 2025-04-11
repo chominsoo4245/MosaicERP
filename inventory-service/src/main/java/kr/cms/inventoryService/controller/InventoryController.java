@@ -3,7 +3,6 @@ package kr.cms.inventoryService.controller;
 import kr.cms.common.dto.ApiResponse;
 import kr.cms.inventoryService.dto.InventoryDTO;
 import kr.cms.inventoryService.dto.InventoryHistoryDTO;
-import kr.cms.inventoryService.dto.InventorySearchParamDTO;
 import kr.cms.inventoryService.dto.InventoryUpdateRequestDTO;
 import kr.cms.inventoryService.service.InventoryService;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +22,23 @@ public class InventoryController {
             @RequestParam("itemId") Long itemId,
             @RequestParam("warehouseId") Integer warehouseId,
             @RequestParam(name = "binId", required = false) Integer binId,
-            @RequestParam(name = "lotNumber", required = false) String lotNumber,
+            @RequestParam(name = "lotId", required = false) Integer lotId,
             @RequestHeader("X-Forwarded-For") String ip,
             @RequestHeader("X-User-Agent") String userAgent,
             @RequestHeader("X-User-Id") String loginId
     ) {
         ip = ip.split(",")[0];
-        return inventoryService.getInventory(itemId, warehouseId, binId, lotNumber, ip, userAgent, loginId);
+        return inventoryService.getInventory(itemId, warehouseId, binId, lotId, ip, userAgent, loginId);
+    }
+
+    @GetMapping("/list")
+    public ApiResponse<List<InventoryDTO>> getInventoryList(
+            @RequestHeader("X-Forwarded-For") String ip,
+            @RequestHeader("X-User-Agent") String userAgent,
+            @RequestHeader("X-User-Id") String loginId
+    ) {
+        ip = ip.split(",")[0];
+        return inventoryService.getInventoryList(ip, userAgent, loginId);
     }
 
     @GetMapping("/detail/{inventoryId}")
@@ -41,29 +50,6 @@ public class InventoryController {
     ) {
         ip = ip.split(",")[0];
         return inventoryService.getInventoryDetail(inventoryId, ip, userAgent, loginId);
-    }
-
-    @GetMapping("/search")
-    public ApiResponse<List<InventoryDTO>> searchInventory(
-            @RequestParam(required = false) Long itemId,
-            @RequestParam(required = false) Integer warehouseId,
-            @RequestParam(required = false) String fromCreatedAt,  // 예: "2025-04-01T00:00:00"
-            @RequestParam(required = false) String toCreatedAt,
-            @RequestParam(required = false) String keyword,
-            @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent,
-            @RequestHeader("X-User-Id") String loginId
-    ) {
-        ip = ip.split(",")[0];
-        LocalDateTime fromDate = (fromCreatedAt != null) ? LocalDateTime.parse(fromCreatedAt) : null;
-        LocalDateTime toDate = (toCreatedAt != null) ? LocalDateTime.parse(toCreatedAt) : null;
-        if (keyword != null && keyword.trim().isEmpty()) {
-            keyword = null;
-        }
-
-        InventorySearchParamDTO searchParam = new InventorySearchParamDTO(itemId, warehouseId, fromDate, toDate, keyword);
-
-        return inventoryService.searchInventory(searchParam, ip, userAgent, loginId);
     }
 
     @PostMapping("/increase")
@@ -93,12 +79,12 @@ public class InventoryController {
             @RequestParam("itemId") Long itemId,
             @RequestParam("warehouseId") Integer warehouseId,
             @RequestParam(name = "binId", required = false) Integer binId,
-            @RequestParam(name = "lotNumber", required = false) String lotNumber,
+            @RequestParam(name = "lotId", required = false) Integer lotId,
             @RequestHeader("X-Forwarded-For") String ip,
             @RequestHeader("X-User-Agent") String userAgent,
             @RequestHeader("X-User-Id") String loginId
     ) {
         ip = ip.split(",")[0];
-        return inventoryService.getInventoryHistory(itemId, warehouseId, binId, lotNumber, ip, userAgent, loginId);
+        return inventoryService.getInventoryHistory(itemId, warehouseId, binId, lotId, ip, userAgent, loginId);
     }
 }

@@ -11,11 +11,6 @@ export const getInventoryDetailAPI = async (inventoryId, headers) => {
   return response.data;
 }
 
-export const searchInventoryAPI = async (params) => {
-  const response = await api.get('inventory-service/search', {params});
-  return response.data;
-}
-
 export const increaseInventoryAPI = async (data) => {
   const response = await api.post(`/inventory-service/increase`, data);
   return response.data;

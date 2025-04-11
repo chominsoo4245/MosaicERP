@@ -25,8 +25,7 @@ public class Inventory {
     private Integer warehouseId;
 
     private Integer binId;
-    private String lotNumber;
-    private LocalDateTime expirationDate;
+    private Integer lotId;
 
     @Column(nullable = false)
     private Integer currentQuantity;

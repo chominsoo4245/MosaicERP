@@ -9,8 +9,7 @@ public class InventoryUpdateRequestDTO {
     private Long itemId;
     private Integer warehouseId;
     private Integer binId;
-    private String LotNumber;
-    private LocalDateTime expirationDate;
+    private Integer lotId;
     private int quantity;
     private String originRef;
 }

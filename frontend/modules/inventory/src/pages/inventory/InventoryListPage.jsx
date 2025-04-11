@@ -1,39 +1,49 @@
 import React, {useEffect, useState, useCallback} from "react";
 import PageLayout from "../../components/Layout/PageLayout.jsx";
 import ButtonLayout from "../../components/Layout/ButtonLayout.jsx";
-import {searchInventoryAPI} from "../../services/InventoryService.jsx";
+import GenericSearchLayout from "../../components/Layout/GenericSearchLayout.jsx";
 
 const InventoryListPage = () => {
     const [inventoryList, setInventoryList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const searchParams = {
-        itemId: null,
-        warehouseId: null,
-        fromCreatedAt: null,
-        toCreatedAt: null,
-        keyword: ""
-    };
+    const searchFields = [
+        { name: "itemId", label: "품목 ID", type: "number", placeholder: "예: 1001" },
+        { name: "warehouseId", label: "창고 ID", type: "number", placeholder: "예: 1" },
+        { name: "fromCreatedAt", label: "생성일 시작", type: "datetime-local", placeholder: "" },
+        { name: "toCreatedAt", label: "생성일 종료", type: "datetime-local", placeholder: "" },
+        { name: "keyword", label: "키워드 (LOT)", type: "text", placeholder: "검색어 입력" },
+    ];
 
-    useEffect(() => {
-        const fetchInventory = async () => {
-            setLoading(true);
-            const response = await searchInventoryAPI(searchParams);
-            if(response.success) {
+    const fetchInventory = async (searchParams) => {
+        setLoading(true);
+        try {
+            response.success = false;
+            if (response.success) {
                 setInventoryList(response.data);
             } else {
                 setError(response.message || "재고 데이터를 가져오는데 실패했습니다.");
             }
-
-            setLoading(false);
-        };
-
-        fetchInventory();
+        } catch (err) {
+            setError(err.message || "재고 데이터를 가져오는데 실패했습니다.");
+        }
+        setLoading(false);
+    };
+    useEffect(() => {
+        fetchInventory({
+            itemId: null,
+            warehouseId: null,
+            fromCreatedAt: null,
+            toCreatedAt: null,
+            keyword: null,
+        });
     }, []);
 
     return (
-        <PageLayout title="재고 목록" breadcrumb={["재고 관리", "목록"]} actions={<ButtonLayout actions={[]}/>}>
+        <PageLayout title="현재 재고" breadcrumb={["재고 관리", "현재 재고"]} actions={<ButtonLayout actions={[]} />}>
+            {/* 범용 검색 폼 컴포넌트 사용 */}
+            <GenericSearchLayout fields={searchFields} onSearch={fetchInventory} />
             {loading && <p>Loading...</p>}
             {error && <p className="text-red-500">{error}</p>}
             {!loading && !error && inventoryList.length > 0 ? (

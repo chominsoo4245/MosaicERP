@@ -1,0 +1,154 @@
+name: CI/CD Workflow
+
+# main 또는 pull_request 이벤트에 대해 트리거합니다.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # 1. 인프라 그룹: Eureka
+  build_infra:
+    name: Build and Test Infrastructure Services
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Grant execute permission to Gradle Wrapper
+        run: chmod +x ./gradlew
+
+      - name: Build eureka-server
+        run: ./gradlew :eureka-server:clean :eureka-server:build --no-daemon
+
+      - name: Test eureka-server
+        run: ./gradlew :eureka-server:test --no-daemon
+
+
+  # 2. API 게이트웨이 및 인증 서비스 그룹
+  build_api:
+    name: Build and Test API Gateway & Auth Services
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Grant execute permission for Gradlew
+        run: chmod +x gradlew
+
+      - name: Build API Gateway
+        run: ./gradlew :api-gateway:clean :api-gateway:build --no-daemon
+
+      - name: Build Auth Service
+        run: ./gradlew :auth-service:clean :auth-service:build --no-daemon
+
+      - name: Build Login Service
+        run: ./gradlew :login-service:clean :login-service:build --no-daemon
+
+      - name: Run Tests for API & Auth Services
+        run: ./gradlew :api-gateway:test :auth-service:test :login-service:test --no-daemon
+
+  # 3. 로그 / 모니터링 / 감사 그룹
+  build_logAudit:
+    name: Build and Test logAudit Services
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build Access Log Service
+        run: ./gradlew :access-log-service:clean :access-log-service:build --no-daemon
+
+      - name: Build Audit Log Service
+        run: ./gradlew :audit-log-service:clean :audit-log-service:build --no-daemon
+
+      - name: Test eureka-server
+        run: ./gradlew :access-log-service:test audit-log-service:test
+
+  # 4. 비즈니스 서비스 그룹
+  build_business:
+    name: Build and Test Business Services
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Grant execute permission for Gradlew
+        run: chmod +x gradlew
+
+      - name: Build Bin Service
+        run: ./gradlew :bin-service:clean :bin-service:build --no-daemon
+
+      - name: Build Inventory Service
+        run: ./gradlew :inventory-service:clean :inventory-service:build --no-daemon
+
+      - name: Build Inbound Service
+        run: ./gradlew :inbound-service:clean :inbound-service:build --no-daemon
+
+      - name: Build Item Service
+        run: ./gradlew :item-service:clean :item-service:build --no-daemon
+
+      - name: Build Lot Service
+        run: ./gradlew :lot-service:clean :lot-service:build --no-daemon
+
+      - name: Build User Service
+        run: ./gradlew :user-service:clean :user-service:build --no-daemon
+
+      - name: Build Warehouse Service
+        run: ./gradlew :warehouse-service:clean :warehouse-service:build --no-daemon
+
+      - name: Build Outbound Service
+        run: ./gradlew :outbound-service:clean :outbound-service:build --no-daemon
+
+      - name: Run Tests for Business Services
+        run: ./gradlew :bin-service:test :inventory-service:test :inbound-service:test :item-service:test :lot-service:test :user-service:test :warehouse-service:test :outbound-service:test --no-daemon
+
+  # 5. 도메인 BFF 그룹
+  build_bff:
+    name: Build and Test Domain BFF Services
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Grant execute permission for Gradlew
+        run: chmod +x gradlew
+
+      - name: Build Inventory BFF
+        run: ./gradlew :inventory-bff:clean :inventory-bff:build --no-daemon
+
+      - name: Run Tests for Inventory BFF
+        run: ./gradlew :inventory-bff:test --no-daemon

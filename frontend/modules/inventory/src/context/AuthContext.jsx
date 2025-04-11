@@ -6,18 +6,17 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
     const navigate = useNavigate();
-    const [auth, setAuth] = useState({
-       accessToken: localStorage.getItem("accessToken"),
-       refreshToken: localStorage.getItem("refreshToken"),
-       loginId: localStorage.getItem("loginId"),
-       isAuthenticated: false,
+    const [auth, setAuth] = useState(() => {
+        const accessToken = localStorage.getItem("accessToken");
+        const refreshToken = localStorage.getItem("refreshToken");
+        const loginId = localStorage.getItem("loginId");
+        return {
+            accessToken,
+            refreshToken,
+            loginId,
+            isAuthenticated: accessToken ? true : false,
+        };
     });
-
-    useEffect(() => {
-        if (auth.accessToken) {
-            setAuth((prev) => ({...prev, isAuthenticated: true}));
-        }
-    }, [auth.accessToken]);
 
     const login = ({accessToken, refreshToken, loginId}) => {
         localStorage.setItem("accessToken", accessToken);

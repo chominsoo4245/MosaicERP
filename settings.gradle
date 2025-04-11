@@ -7,9 +7,16 @@ include("eureka-server")
 include("login-service")
 
 // erp micro service
+include("item-service")
+include("warehouse-service")
+include("bin-service")
+include("lot-service")
 include("inbound-service")
 include("inventory-service")
 include("outbound-service")
+
+// erp micro bff
+include("inventory-bff")
 
 // log service
 include("access-log-service")

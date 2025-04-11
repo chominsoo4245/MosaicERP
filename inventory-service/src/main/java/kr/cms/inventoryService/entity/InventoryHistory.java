@@ -24,8 +24,7 @@ public class InventoryHistory {
     private Integer warehouseId;
 
     private Integer binId;
-    private String lotNumber;
-    private LocalDateTime expirationDate;
+    private Integer lotId;
 
     @Column(nullable = false, length = 20)
     private String transactionType;

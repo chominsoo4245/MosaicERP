@@ -14,8 +14,7 @@ public class InventoryDTO {
     private Long itemId;
     private Integer warehouseId;
     private Integer binId;
-    private String lotNumber;
-    private LocalDateTime expirationDate;
+    private Integer lotId;
     private Integer currentQuantity;
     private Integer reservedQuantity;
     private int version;
