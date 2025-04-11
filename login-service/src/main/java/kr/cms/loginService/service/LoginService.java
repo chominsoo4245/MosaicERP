@@ -1,7 +1,7 @@
 package kr.cms.loginService.service;
 
 import kr.cms.common.dto.ApiResponse;
-import kr.cms.common.dto.AuditLogDto;
+import kr.cms.common.dto.AuditLogDTO;
 import kr.cms.loginService.dto.LoginRequest;
 import kr.cms.loginService.dto.TokenRequest;
 import kr.cms.loginService.dto.UserRequest;
@@ -85,7 +85,7 @@ public class LoginService {
 
     private void sendSuccessAudit(String action, String loginId, String ip, String agent) {
         logProducer.sendAuditLog(
-                new AuditLogDto(
+                new AuditLogDTO(
                         action,
                         loginId,
                         "정상 처리됨",
@@ -98,7 +98,7 @@ public class LoginService {
 
     private void sendFailAudit(String loginId, String reason, String ip, String agent) {
         logProducer.sendAuditLog(
-                new AuditLogDto(
+                new AuditLogDTO(
                         "LOGIN_FAIL",
                         loginId,
                         reason,

@@ -6,7 +6,10 @@ import kr.cms.authService.dto.UserRequest;
 import kr.cms.common.dto.ApiResponse;
 import kr.cms.authService.exception.InvalidTokenException;
 import kr.cms.authService.service.TokenService;
+import kr.cms.common.dto.HeaderInfoDTO;
 import kr.cms.common.dto.TokenResponse;
+import kr.cms.common.extractor.HeaderExtractor;
+import kr.cms.common.provider.HeaderProvider;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,16 +22,15 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     private final TokenService tokenService;
+    private final HeaderProvider headerProvider;
 
     @PostMapping("/issue")
     public ApiResponse<TokenResponse> issue(
-            @RequestBody UserRequest userRequest,
-            @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent
+            @RequestBody UserRequest userRequest
     ) {
-        ip = ip.split(",")[0];
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         try {
-            return tokenService.issueToken(userRequest, ip, userAgent);
+            return tokenService.issueToken(userRequest, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent());
         } catch (IllegalArgumentException e) {
             logger.warn("잘못된 입력 값: {}", e.getMessage());
             return ApiResponse.fail(e.getMessage());
@@ -40,15 +42,12 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ApiResponse<TokenResponse> refresh(
-            @RequestBody TokenRequest request,
-            @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent,
-            @RequestHeader("X-User-Id") String loginId
+            @RequestBody TokenRequest request
     ) {
-        ip = ip.split(",")[0];
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
 
         try {
-            return tokenService.refreshToken(request, ip, userAgent, loginId);
+            return tokenService.refreshToken(request, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
         } catch (InvalidTokenException e) {
             logger.warn("유효하지 않은 토큰: {}", e.getMessage());
             return ApiResponse.fail(e.getMessage());
@@ -60,15 +59,12 @@ public class AuthController {
 
     @PostMapping("/revoke")
     public ApiResponse<String> revoke(
-            @RequestBody TokenRequest request,
-            @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent,
-            @RequestHeader("X-User-Id") String loginId
+            @RequestBody TokenRequest request
     ) {
-        ip = ip.split(",")[0];
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
 
         try {
-            return tokenService.revokeToken(request, ip, userAgent, loginId);
+            return tokenService.revokeToken(request, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
         } catch (InvalidTokenException e) {
             logger.warn("유효하지 않은 토큰 폐기 요청: {}", e.getMessage());
             return ApiResponse.fail(e.getMessage());

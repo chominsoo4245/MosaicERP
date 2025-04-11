@@ -2,7 +2,7 @@ package kr.cms.common.dto;
 
 import java.time.LocalDateTime;
 
-public class AccessLogDto implements BaseLogDto {
+public class AccessLogDTO implements BaseLogDTO {
     private String method;
     private String path;
     private String ip;
@@ -11,11 +11,11 @@ public class AccessLogDto implements BaseLogDto {
     private long responseTimeMs;
     private LocalDateTime timestamp;
 
-    public AccessLogDto(){
+    public AccessLogDTO(){
 
     }
 
-    public AccessLogDto(String method, String path, String ip, String userAgent, int statusCode, long responseTimeMs, LocalDateTime timestamp) {
+    public AccessLogDTO(String method, String path, String ip, String userAgent, int statusCode, long responseTimeMs, LocalDateTime timestamp) {
         this.method = method;
         this.path = path;
         this.ip = ip;

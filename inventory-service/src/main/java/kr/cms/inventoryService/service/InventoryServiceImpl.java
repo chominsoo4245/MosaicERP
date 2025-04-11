@@ -2,7 +2,7 @@ package kr.cms.inventoryService.service;
 
 import jakarta.transaction.Transactional;
 import kr.cms.common.dto.ApiResponse;
-import kr.cms.common.dto.AuditLogDto;
+import kr.cms.common.dto.AuditLogDTO;
 import kr.cms.inventoryService.dto.InventoryDTO;
 import kr.cms.inventoryService.dto.InventoryHistoryDTO;
 import kr.cms.inventoryService.dto.InventoryUpdateRequestDTO;
@@ -33,7 +33,7 @@ public class InventoryServiceImpl implements InventoryService {
             Inventory inventory = inventoryRepository.findByItemIdAndWarehouseIdAndBinIdAndLotId(itemId, warehouseId, binId, lotId)
                     .orElseThrow(() -> new RuntimeException("Inventory not found"));
             InventoryDTO dto = convertToInventoryDTO(inventory);
-            logSender.sendAuditLog(new AuditLogDto(
+            logSender.sendAuditLog(new AuditLogDTO(
                     "GET_INVENTORY_SUCCESS",
                     loginId,
                     "Inventory retrieved successfully.",
@@ -43,7 +43,7 @@ public class InventoryServiceImpl implements InventoryService {
             ));
             return ApiResponse.success(dto);
         } catch (Exception e) {
-            logSender.sendAuditLog(new AuditLogDto(
+            logSender.sendAuditLog(new AuditLogDTO(
                     "GET_INVENTORY_FAIL",
                     loginId,
                     "Error retrieving inventory: " + e.getMessage(),
@@ -61,7 +61,7 @@ public class InventoryServiceImpl implements InventoryService {
             List<Inventory> inventoryList = inventoryRepository.findAll();
             List<InventoryDTO> dtoList = new ArrayList<>();
             for (Inventory inventory : inventoryList) dtoList.add(convertToInventoryDTO(inventory));
-            logSender.sendAuditLog(new AuditLogDto(
+            logSender.sendAuditLog(new AuditLogDTO(
                     "GET_INVENTORY_LIST_SUCCESS",
                     loginId,
                     "Inventory list retrieved successfully.",
@@ -72,7 +72,7 @@ public class InventoryServiceImpl implements InventoryService {
             ));
             return ApiResponse.success(dtoList);
         } catch (Exception e) {
-            logSender.sendAuditLog(new AuditLogDto(
+            logSender.sendAuditLog(new AuditLogDTO(
                     "GET_INVENTORY_LIST_FAIL",
                     loginId,
                     "Error retrieving inventory list: " + e.getMessage(),
@@ -91,7 +91,7 @@ public class InventoryServiceImpl implements InventoryService {
             Inventory inventory = inventoryRepository.findById(inventoryId)
                     .orElseThrow(() -> new RuntimeException("Inventory not found"));
             InventoryDTO dto = convertToInventoryDTO(inventory);
-            logSender.sendAuditLog(new AuditLogDto(
+            logSender.sendAuditLog(new AuditLogDTO(
                     "GET_INVENTORY_DETAIL_SUCCESS",
                     loginId,
                     "Inventory detail retrieved successfully.",
@@ -101,7 +101,7 @@ public class InventoryServiceImpl implements InventoryService {
             ));
             return ApiResponse.success(dto);
         } catch (Exception e) {
-            logSender.sendAuditLog(new AuditLogDto(
+            logSender.sendAuditLog(new AuditLogDTO(
                     "GET_INVENTORY_DETAIL_FAIL",
                     loginId,
                     "Error retrieving inventory detail: " + e.getMessage(),
@@ -145,7 +145,7 @@ public class InventoryServiceImpl implements InventoryService {
             createInventoryHistory(itemId, warehouseId, binId, lotId,
                     "INBOUND", quantity, preQuantity, saved.getCurrentQuantity(), originRef, "inbound_service");
 
-            logSender.sendAuditLog(new AuditLogDto(
+            logSender.sendAuditLog(new AuditLogDTO(
                     "INCREASE_INVENTORY_SUCCESS",
                     loginId,
                     "Inventory increased by " + quantity + " units.",
@@ -155,7 +155,7 @@ public class InventoryServiceImpl implements InventoryService {
             ));
             return ApiResponse.success(convertToInventoryDTO(saved));
         } catch (Exception e) {
-            logSender.sendAuditLog(new AuditLogDto(
+            logSender.sendAuditLog(new AuditLogDTO(
                     "INCREASE_INVENTORY_FAIL",
                     loginId,
                     "Error increasing inventory: " + e.getMessage(),
@@ -184,7 +184,7 @@ public class InventoryServiceImpl implements InventoryService {
             int preQuantity = inventory.getCurrentQuantity();
             if (preQuantity < quantity) {
                 String errMsg = "Insufficient inventory: Requested " + quantity + ", available " + preQuantity;
-                logSender.sendAuditLog(new AuditLogDto(
+                logSender.sendAuditLog(new AuditLogDTO(
                         "DECREASE_INVENTORY_FAIL",
                         loginId,
                         errMsg,
@@ -201,7 +201,7 @@ public class InventoryServiceImpl implements InventoryService {
             createInventoryHistory(itemId, warehouseId, binId, lotId,
                     "OUTBOUND", -quantity, preQuantity, saved.getCurrentQuantity(), originRef, "outbound_service");
 
-            logSender.sendAuditLog(new AuditLogDto(
+            logSender.sendAuditLog(new AuditLogDTO(
                     "DECREASE_INVENTORY_SUCCESS",
                     loginId,
                     "Inventory decreased by " + quantity + " units.",
@@ -211,7 +211,7 @@ public class InventoryServiceImpl implements InventoryService {
             ));
             return ApiResponse.success(convertToInventoryDTO(saved));
         } catch (Exception e) {
-            logSender.sendAuditLog(new AuditLogDto(
+            logSender.sendAuditLog(new AuditLogDTO(
                     "DECREASE_INVENTORY_FAIL",
                     loginId,
                     "Error decreasing inventory: " + e.getMessage(),
@@ -230,7 +230,7 @@ public class InventoryServiceImpl implements InventoryService {
                     .stream()
                     .map(this::convertToInventoryHistoryDTO)
                     .collect(Collectors.toList());
-            logSender.sendAuditLog(new AuditLogDto(
+            logSender.sendAuditLog(new AuditLogDTO(
                     "GET_INVENTORY_HISTORY_SUCCESS",
                     loginId,
                     "Retrieved " + histories.size() + " inventory history records.",
@@ -240,7 +240,7 @@ public class InventoryServiceImpl implements InventoryService {
             ));
             return ApiResponse.success(histories);
         } catch (Exception e) {
-            logSender.sendAuditLog(new AuditLogDto(
+            logSender.sendAuditLog(new AuditLogDTO(
                     "GET_INVENTORY_HISTORY_FAIL",
                     loginId,
                     "Error retrieving inventory history: " + e.getMessage(),

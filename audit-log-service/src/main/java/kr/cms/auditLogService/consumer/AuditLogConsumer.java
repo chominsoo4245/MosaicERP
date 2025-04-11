@@ -6,7 +6,7 @@ import kr.cms.auditLogService.entity.LoginAuditLog;
 import kr.cms.auditLogService.repository.AuthAuditLogRepository;
 import kr.cms.auditLogService.repository.InventoryAuditLogRepository;
 import kr.cms.auditLogService.repository.LoginAuditLogRepository;
-import kr.cms.common.dto.AuditLogDto;
+import kr.cms.common.dto.AuditLogDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -22,7 +22,7 @@ public class AuditLogConsumer {
     private final InventoryAuditLogRepository inventoryAuditLogRepository;
 
     @KafkaListener(topics = "auth-audit-log", groupId = "auth-audit-log-group")
-    public void consumeAuthAudit(AuditLogDto logDto) {
+    public void consumeAuthAudit(AuditLogDTO logDto) {
         log.info("[AUTH-AUDIT-LOG] {} {} from IP = {} | UA='{}' | message = {} | at {}",
                 logDto.getAction(),
                 logDto.getLoginId(),
@@ -45,7 +45,7 @@ public class AuditLogConsumer {
     }
 
     @KafkaListener(topics = "login-audit-log", groupId = "login-audit-log-group")
-    public void consumeLoginAudit(AuditLogDto logDto){
+    public void consumeLoginAudit(AuditLogDTO logDto){
         log.info("[LOGIN-AUDIT-LOG] {} {} from IP = {} | UA='{}' | message = {} | at {}",
                 logDto.getAction(),
                 logDto.getLoginId(),
@@ -68,7 +68,7 @@ public class AuditLogConsumer {
     }
 
     @KafkaListener(topics = "inventory-audit-log", groupId = "inventory-audit-log-group")
-    public void consumeInventoryAudit(AuditLogDto logDto){
+    public void consumeInventoryAudit(AuditLogDTO logDto){
         log.info("[INVENTORY-AUDIT-LOG] {} {} from IP = {} | UA='{}' | message = {} | at {}",
                 logDto.getAction(),
                 logDto.getLoginId(),

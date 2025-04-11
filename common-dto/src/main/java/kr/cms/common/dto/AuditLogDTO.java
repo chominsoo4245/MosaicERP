@@ -2,7 +2,7 @@ package kr.cms.common.dto;
 
 import java.time.LocalDateTime;
 
-public class AuditLogDto implements BaseLogDto {
+public class AuditLogDTO implements BaseLogDTO {
     private String action;
     private String loginId;
     private String description;
@@ -10,11 +10,11 @@ public class AuditLogDto implements BaseLogDto {
     private String userAgent;
     private LocalDateTime timestamp;
 
-    public AuditLogDto() {
+    public AuditLogDTO() {
 
     }
 
-    public AuditLogDto(String action, String loginId, String description, String ip, String userAgent, LocalDateTime timestamp) {
+    public AuditLogDTO(String action, String loginId, String description, String ip, String userAgent, LocalDateTime timestamp) {
         this.action = action;
         this.loginId = loginId;
         this.description = description;

@@ -1,6 +1,9 @@
 package kr.cms.inventoryService.controller;
 
 import kr.cms.common.dto.ApiResponse;
+import kr.cms.common.dto.HeaderInfoDTO;
+import kr.cms.common.extractor.HeaderExtractor;
+import kr.cms.common.provider.HeaderProvider;
 import kr.cms.inventoryService.dto.InventoryDTO;
 import kr.cms.inventoryService.dto.InventoryHistoryDTO;
 import kr.cms.inventoryService.dto.InventoryUpdateRequestDTO;
@@ -8,7 +11,6 @@ import kr.cms.inventoryService.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -16,62 +18,47 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InventoryController {
     private final InventoryService inventoryService;
+    private final HeaderProvider headerProvider;
 
     @GetMapping
     public ApiResponse<InventoryDTO> getInventory(
             @RequestParam("itemId") Long itemId,
             @RequestParam("warehouseId") Integer warehouseId,
             @RequestParam(name = "binId", required = false) Integer binId,
-            @RequestParam(name = "lotId", required = false) Integer lotId,
-            @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent,
-            @RequestHeader("X-User-Id") String loginId
+            @RequestParam(name = "lotId", required = false) Integer lotId
     ) {
-        ip = ip.split(",")[0];
-        return inventoryService.getInventory(itemId, warehouseId, binId, lotId, ip, userAgent, loginId);
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
+        return inventoryService.getInventory(itemId, warehouseId, binId, lotId, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 
     @GetMapping("/list")
-    public ApiResponse<List<InventoryDTO>> getInventoryList(
-            @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent,
-            @RequestHeader("X-User-Id") String loginId
-    ) {
-        ip = ip.split(",")[0];
-        return inventoryService.getInventoryList(ip, userAgent, loginId);
+    public ApiResponse<List<InventoryDTO>> getInventoryList() {
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
+        return inventoryService.getInventoryList(headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 
     @GetMapping("/detail/{inventoryId}")
     public ApiResponse<InventoryDTO> getInventoryDetail(
-            @RequestParam("inventoryId") Long inventoryId,
-            @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent,
-            @RequestHeader("X-User-Id") String loginId
+            @RequestParam("inventoryId") Long inventoryId
     ) {
-        ip = ip.split(",")[0];
-        return inventoryService.getInventoryDetail(inventoryId, ip, userAgent, loginId);
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
+        return inventoryService.getInventoryDetail(inventoryId, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 
     @PostMapping("/increase")
     public ApiResponse<InventoryDTO> increaseInventory(
-            @RequestBody InventoryUpdateRequestDTO inventoryUpdateRequestDTO,
-            @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent,
-            @RequestHeader("X-User-Id") String loginId
+            @RequestBody InventoryUpdateRequestDTO inventoryUpdateRequestDTO
     ) {
-        ip = ip.split(",")[0];
-        return inventoryService.increaseInventory(inventoryUpdateRequestDTO, ip, userAgent, loginId);
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
+        return inventoryService.increaseInventory(inventoryUpdateRequestDTO, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 
     @PostMapping("/decrease")
     public ApiResponse<InventoryDTO> decreaseInventory(
-            @RequestBody InventoryUpdateRequestDTO inventoryUpdateRequestDTO,
-            @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent,
-            @RequestHeader("X-User-Id") String loginId
+            @RequestBody InventoryUpdateRequestDTO inventoryUpdateRequestDTO
     ) {
-        ip = ip.split(",")[0];
-        return inventoryService.decreaseInventory(inventoryUpdateRequestDTO, ip, userAgent, loginId);
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
+        return inventoryService.decreaseInventory(inventoryUpdateRequestDTO, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 
     @GetMapping("/history")
@@ -79,12 +66,9 @@ public class InventoryController {
             @RequestParam("itemId") Long itemId,
             @RequestParam("warehouseId") Integer warehouseId,
             @RequestParam(name = "binId", required = false) Integer binId,
-            @RequestParam(name = "lotId", required = false) Integer lotId,
-            @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent,
-            @RequestHeader("X-User-Id") String loginId
+            @RequestParam(name = "lotId", required = false) Integer lotId
     ) {
-        ip = ip.split(",")[0];
-        return inventoryService.getInventoryHistory(itemId, warehouseId, binId, lotId, ip, userAgent, loginId);
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
+        return inventoryService.getInventoryHistory(itemId, warehouseId, binId, lotId, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 }

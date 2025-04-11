@@ -1,7 +1,10 @@
 package kr.cms.loginService.controller;
 
 import kr.cms.common.dto.ApiResponse;
+import kr.cms.common.dto.HeaderInfoDTO;
 import kr.cms.common.dto.TokenResponse;
+import kr.cms.common.extractor.HeaderExtractor;
+import kr.cms.common.provider.HeaderProvider;
 import kr.cms.loginService.dto.LoginRequest;
 import kr.cms.loginService.dto.TokenRequest;
 import kr.cms.loginService.service.LoginService;
@@ -13,27 +16,21 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class LoginController {
     private final LoginService loginService;
+    private final HeaderProvider headerProvider;
 
     @PostMapping("/login")
     public ApiResponse<TokenResponse> login(
-            @RequestBody LoginRequest request,
-            @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent
+            @RequestBody LoginRequest request
     ) {
-        ip = ip.split(",")[0];
-
-        return loginService.login(request, ip, userAgent);
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
+        return loginService.login(request, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent());
     }
 
     @PostMapping("/logout")
     public ApiResponse<String> logout(
-            @RequestBody TokenRequest request,
-            @RequestHeader("X-Forwarded-For") String ip,
-            @RequestHeader("X-User-Agent") String userAgent,
-            @RequestHeader("X-User-Id") String loginId
+            @RequestBody TokenRequest request
     ) {
-        ip = ip.split(",")[0];
-
-        return loginService.logout(request, ip, userAgent, loginId);
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
+        return loginService.logout(request, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 }

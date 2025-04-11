@@ -2,7 +2,7 @@ package kr.cms.accessLogService.consumer;
 
 import kr.cms.accessLogService.entity.AccessLog;
 import kr.cms.accessLogService.repository.AccessLogRepository;
-import kr.cms.common.dto.AccessLogDto;
+import kr.cms.common.dto.AccessLogDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -18,7 +18,7 @@ public class AccessLogConsumer {
     @KafkaListener(topics = {
             "api-gateway-access-log",
     }, groupId = "access-log-group")
-    public void listen(AccessLogDto logDto) {
+    public void listen(AccessLogDTO logDto) {
         log.info("[ACCESS-LOG] {} {} from IP = {} | UA='{}' | status = {} | {} ms",
                 logDto.getMethod(),
                 logDto.getPath(),

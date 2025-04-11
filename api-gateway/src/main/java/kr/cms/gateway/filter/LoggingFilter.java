@@ -1,6 +1,6 @@
 package kr.cms.gateway.filter;
 
-import kr.cms.common.dto.AccessLogDto;
+import kr.cms.common.dto.AccessLogDTO;
 import kr.cms.gateway.logging.LogSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +48,7 @@ public class LoggingFilter implements GlobalFilter, Ordered {
                     HttpStatus status = (HttpStatus) exchange.getResponse().getStatusCode();
                     Instant end = Instant.now();
 
-                    AccessLogDto logDto = new AccessLogDto();
+                    AccessLogDTO logDto = new AccessLogDTO();
                     logDto.setMethod(method);
                     logDto.setPath(path);
                     logDto.setIp(ip);

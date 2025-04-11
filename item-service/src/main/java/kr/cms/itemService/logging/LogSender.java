@@ -1,4 +1,4 @@
-package kr.cms.inventoryService.logging;
+package kr.cms.itemService.logging;
 
 import kr.cms.common.dto.AuditLogDTO;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class LogSender {
 
     private final KafkaTemplate<String, AuditLogDTO> kafkaTemplate;
-    private static final String INVENTORY_AUDIT_LOG = "inventory-audit-log";
+    private static final String INVENTORY_AUDIT_LOG = "item-audit-log";
 
     public void sendAuditLog(AuditLogDTO dto){
         kafkaTemplate.send(INVENTORY_AUDIT_LOG, dto).whenComplete((res, ex) -> {

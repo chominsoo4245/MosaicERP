@@ -23,5 +23,6 @@ include("access-log-service")
 include("audit-log-service")
 
 
-// auth, login-service, sns-login-service
+// common (dto, util, core)
 include("common-dto")
+include("common-util")

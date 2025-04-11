@@ -6,7 +6,7 @@ import kr.cms.authService.dto.TokenRequest;
 import kr.cms.authService.dto.UserRequest;
 import kr.cms.authService.exception.InvalidTokenException;
 import kr.cms.authService.jwt.JwtProvider;
-import kr.cms.common.dto.AuditLogDto;
+import kr.cms.common.dto.AuditLogDTO;
 import kr.cms.common.dto.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class TokenService {
 
     public ApiResponse<TokenResponse> issueToken(UserRequest request, String ip, String userAgent) {
         if (request.getLoginId() == null || request.getRole() == null) {
-            logProducer.sendAuditLog(new AuditLogDto(
+            logProducer.sendAuditLog(new AuditLogDTO(
                     "ISSUE_FAIL",
                     null,
                     "필수 정보 누락",
@@ -78,7 +78,7 @@ public class TokenService {
     }
 
     private void sendSuccessAudit(String action, String loginId, String ip, String agent) {
-        logProducer.sendAuditLog(new AuditLogDto(
+        logProducer.sendAuditLog(new AuditLogDTO(
                 action,
                 loginId,
                 "정상 처리됨",
@@ -89,7 +89,7 @@ public class TokenService {
     }
 
     private void sendFailAuditInvalidToken(String action, String loginId, String ip, String agent) {
-        logProducer.sendAuditLog(new AuditLogDto(
+        logProducer.sendAuditLog(new AuditLogDTO(
                 action,
                 loginId,
                 "유효하지 않은 토큰",
