@@ -127,8 +127,11 @@ jobs:
       - name: Build Outbound Service
         run: ./gradlew :outbound-service:clean :outbound-service:build --no-daemon
 
+      - name: Build Category Service
+        run: ./gradlew :category-service:clean :category-service:build --no-daemon
+
       - name: Run Tests for Business Services
-        run: ./gradlew :bin-service:test :inventory-service:test :inbound-service:test :item-service:test :lot-service:test :user-service:test :warehouse-service:test :outbound-service:test --no-daemon
+        run: ./gradlew :bin-service:test :inventory-service:test :inbound-service:test :item-service:test :lot-service:test :user-service:test :warehouse-service:test :outbound-service:test :category-service:test --no-daemon
 
   # 5. 도메인 BFF 그룹
   build_bff:

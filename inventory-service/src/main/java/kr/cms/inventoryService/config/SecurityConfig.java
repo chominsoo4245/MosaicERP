@@ -22,9 +22,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/inventory-service",
-                                "/inventory-service/detail/**",
-                                "/inventory-service/increase/",
+                                "/inventory-service/**",
+                                "/inventory-service/increase",
                                 "/inventory-service/decrease",
                                 "/inventory-service/history",
                                 "/inventory-service/list",

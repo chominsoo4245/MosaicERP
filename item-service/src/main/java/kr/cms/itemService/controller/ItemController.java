@@ -18,10 +18,10 @@ public class ItemController {
     private final ItemService itemService;
     private final HeaderProvider headerProvider;
 
-    @GetMapping("/detail/{itemId}")
-    public ApiResponse<ItemDTO> getItem(@PathVariable Long itemId) {
+    @GetMapping("/{id}")
+    public ApiResponse<ItemDTO> getItem(@PathVariable Long id) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        return itemService.getItemById(itemId, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
+        return itemService.getItemById(id, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 
     @GetMapping("/list")
@@ -31,26 +31,20 @@ public class ItemController {
     }
 
     @PostMapping("/create")
-    public ApiResponse<String> addItem(
-            @RequestBody ItemDTO itemDTO
-    ) {
+    public ApiResponse<String> addItem(@RequestBody ItemDTO itemDTO) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         return itemService.createItem(itemDTO, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 
-    @PostMapping("/update")
-    public ApiResponse<String> editItem(
-            @RequestBody ItemDTO itemDTO
-    ) {
+    @PutMapping("/update")
+    public ApiResponse<String> editItem(@RequestBody ItemDTO itemDTO) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         return itemService.updateItem(itemDTO, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 
-    @PostMapping("/delete")
-    public ApiResponse<String> removeItem(
-            @RequestBody ItemDTO itemDTO
-    ) {
+    @DeleteMapping("/{id}")
+    public ApiResponse<String> removeItem(@PathVariable Long id) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        return itemService.deleteItem(itemDTO.getItemId(), headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
+        return itemService.deleteItem(id, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 }

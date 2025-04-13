@@ -1,8 +1,9 @@
-package kr.cms.itemService.logging;
+package kr.cms.categoryService.logging;
 
 import kr.cms.common.dto.AuditLogDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +15,15 @@ import java.time.LocalDateTime;
 public class LogSender {
 
     private final KafkaTemplate<String, AuditLogDTO> kafkaTemplate;
-    private static final String ITEM_AUDIT_LOG = "item-audit-log";
+    private static final String TOPIC = "category-audit-log";
 
-    private void sendAuditLog(AuditLogDTO dto){
-        kafkaTemplate.send(ITEM_AUDIT_LOG, dto).whenComplete((res, ex) -> {
-            if(ex != null) {
-                log.error("[KAFKA] Audit Log 전송 실패", ex);
-            }else {
-                log.info("[KAFKA] Audit Log 전송 성공");
+    private void sendAuditLog(AuditLogDTO logDto) {
+        ProducerRecord<String, AuditLogDTO> record = new ProducerRecord<>(TOPIC, logDto);
+        kafkaTemplate.send(record).whenComplete((result, ex) -> {
+            if (ex != null) {
+                log.error("[KAFKA] Audit 로그 전송 실패", ex);
+            } else {
+                log.info("[KAFKA] Audit 로그 전송 성공");
             }
         });
     }

@@ -20,43 +20,26 @@ public class InventoryController {
     private final InventoryService inventoryService;
     private final HeaderProvider headerProvider;
 
-    @GetMapping
-    public ApiResponse<InventoryDTO> getInventory(
-            @RequestParam("itemId") Long itemId,
-            @RequestParam("warehouseId") Integer warehouseId,
-            @RequestParam(name = "binId", required = false) Integer binId,
-            @RequestParam(name = "lotId", required = false) Integer lotId
-    ) {
+    @GetMapping("/{id}")
+    public ApiResponse<InventoryDTO> getInventory(@PathVariable Long id) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        return inventoryService.getInventory(itemId, warehouseId, binId, lotId, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
+        return inventoryService.getInventory(id, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 
     @GetMapping("/list")
     public ApiResponse<List<InventoryDTO>> getInventoryList() {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        return inventoryService.getInventoryList(headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
-    }
-
-    @GetMapping("/detail/{inventoryId}")
-    public ApiResponse<InventoryDTO> getInventoryDetail(
-            @RequestParam("inventoryId") Long inventoryId
-    ) {
-        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        return inventoryService.getInventoryDetail(inventoryId, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
+        return inventoryService.getAllInventory(headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 
     @PostMapping("/increase")
-    public ApiResponse<InventoryDTO> increaseInventory(
-            @RequestBody InventoryUpdateRequestDTO inventoryUpdateRequestDTO
-    ) {
+    public ApiResponse<InventoryDTO> increaseInventory(@RequestBody InventoryUpdateRequestDTO inventoryUpdateRequestDTO) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         return inventoryService.increaseInventory(inventoryUpdateRequestDTO, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
 
     @PostMapping("/decrease")
-    public ApiResponse<InventoryDTO> decreaseInventory(
-            @RequestBody InventoryUpdateRequestDTO inventoryUpdateRequestDTO
-    ) {
+    public ApiResponse<InventoryDTO> decreaseInventory(@RequestBody InventoryUpdateRequestDTO inventoryUpdateRequestDTO) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         return inventoryService.decreaseInventory(inventoryUpdateRequestDTO, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
