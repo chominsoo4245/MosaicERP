@@ -24,6 +24,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/item-service/detail/**",
                                 "/item-service/list",
+                                "/item-service/search",
                                 "/item-service/create",
                                 "/item-service/delete",
                                 "/item-service/update",

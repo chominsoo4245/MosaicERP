@@ -42,7 +42,6 @@ const InventoryListPage = () => {
 
     return (
         <PageLayout title="현재 재고" breadcrumb={["재고 관리", "현재 재고"]} actions={<ButtonLayout actions={[]} />}>
-            {/* 범용 검색 폼 컴포넌트 사용 */}
             <GenericSearchLayout fields={searchFields} onSearch={fetchInventory} />
             {loading && <p>Loading...</p>}
             {error && <p className="text-red-500">{error}</p>}

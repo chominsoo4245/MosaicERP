@@ -17,7 +17,15 @@
 - ✅ Docker & Docker Compose로 로컬 실행 가능
 - ✅ Github Action CI & CD 구현
 
---- 
+---
+
+## 📶 프로젝트 흐름도
+- LOGIN
+    ![image](/figma/login-process.png)
+
+
+---
+
 
 ## 👜 프로젝트 구조
 
@@ -28,13 +36,16 @@ MosaicERP
 ┣- 📂 login-service        (로그인 서비스)
 ┣- 📂 sns-login-service    (SNS 로그인 서비스)
 ┣- 📂 user-service         (유저 서비스)    
-┣- 📂 hr-service           (인사 관리 서비스)  
-┣- 📂 inventory-service    (재고 관리 서비스)  
+┣- 📂 hr-service           (인사 관리 서비스)
+┣- 📂 item-service         (품목 관리 서비스)
+┣- 📂 category-service     (카테고리 관리 서비스)    
+┣- 📂 inventory-service    (재고 관리 서비스)
 ┣- 📂 accounting-service   (회계 서비스)  
 ┣- 📂 file-service         (파일 업로드 서비스)  
 ┣- 📂 config-server        (설정 서버)  
 ┣- 📂 discovery-server     (서비스 등록/발견 [Eureka])  
 ┗- 📂 docker               (Docker 구성 파일)
+    ┗- 📂 kafka               (kafka docker setting)
 ```
 
 ---

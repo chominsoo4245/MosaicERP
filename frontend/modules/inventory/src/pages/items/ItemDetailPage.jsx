@@ -1,56 +1,48 @@
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import PageLayout from "../../components/Layout/PageLayout.jsx";
 import ButtonLayout from "../../components/Layout/ButtonLayout.jsx";
-import ItemForm from "./form/ItemForm.jsx"; // 등록/수정과 동일한 Form
+import ItemForm from "./form/ItemForm.jsx";
+import {getFormInitDataAPI} from "../../services/ItemService.jsx";
 
 export default function ItemDetailPage() {
     const { id } = useParams(); // /items/detail/:id
     const navigate = useNavigate();
     const [item, setItem] = useState(null);
-
-    // 📦 임시 mock 데이터 (실제 API 대체 가능)
-    const mockItems = [
-        {
-            id: 1,
-            name: "고급 나사",
-            code: "A-1001",
-            stock: 320,
-            unit: "EA",
-            price: 1000,
-            category: "나사류",
-            supplier: "A상사",
-            location: "창고 A-1",
-            lot: "LOT-20240401",
-            expirationDate: "2025-04-01",
-            description: "튼튼한 나사입니다.",
-        },
-    ];
-
-    useEffect(() => {
-        const found = mockItems.find((i) => i.id === Number(id));
-        if (found) setItem(found);
-        else alert("해당 품목이 없습니다.");
-    }, [id]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const actions = [
         { label: "수정", type: "update", to: `/items/update/${id}` },
         { label: "목록", type: "list", onClick: () => navigate("/items/list") },
     ];
 
-    const handleDummyChange = () => {
-        // detail 페이지에서는 수정 불가
-    };
+    useEffect(() => {
+        const fetchItem = async () => {
+            try {
+                 const response = await getFormInitDataAPI(id);
+                if (response.success) {
+                    setItem(response.data);
+                } else {
+                    setError(response.message || "품목 상세 정보를 불러오는데 실패했습니다.");
+                }
+            } catch (err) {
+                setError(err.message || "품목 상세 정보를 불러오는데 실패했습니다.");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchItem();
+    }, [id]);
 
+    if (loading) return <PageLayout title="품목 상세 정보" breadcrumb={["품목 관리", "상세 보기"]}><p>Loading...</p></PageLayout>;
+    if (error) return <PageLayout title="품목 상세 정보" breadcrumb={["품목 관리", "상세 보기"]}><p className="text-red-500">{error}</p></PageLayout>;
     if (!item) return null;
 
     return (
-        <PageLayout
-            title="📦 품목 상세 정보"
-            breadcrumb={["품목 관리", "품목 상세"]}
-            actions={<ButtonLayout actions={actions} />}
-        >
-            <ItemForm formData={item} onChange={handleDummyChange} />
+        <PageLayout title="📦 품목 상세 정보" breadcrumb={["품목 관리", "상세 보기"]} actions={<ButtonLayout actions={actions} />}>
+            {/* ItemForm에 readOnly prop을 전달하여 수정 불가능하게 할 수 있습니다. */}
+            <ItemForm formData={item} onChange={() => {}} readOnly />
         </PageLayout>
     );
 }

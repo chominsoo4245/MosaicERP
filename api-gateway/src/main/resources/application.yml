@@ -13,6 +13,7 @@ spring:
   cloud:
     gateway:
       routes:
+        # Auth Login
         - id: auth-service
           uri: lb://auth-service
           predicates:
@@ -23,28 +24,45 @@ spring:
           predicates:
             - Path=/login-service/**
 
+        # Service
         - id: user-service
           uri: lb://user-service
           predicates:
             - Path=/user-service/**
           filters:
             - StripPrefix=1
-#        - id:
-#          uri:
-#          predicates:
-#            -
+
         - id: item-service
           uri: lb://item-service
           predicates:
             - Path=/item-service/**
+
+        - id: supplier-service
+          uri: lb://supplier-service
+          predicates:
+            - Path=/supplier-service/**
+
+        - id: category-service
+          uri: lb://category-service
+          predicates:
+          - Path=/category-service/**
+
         - id: inventory-service
           uri: lb://inventory-service
           predicates:
             - Path=/inventory-service/**
+
+        # BFF
+        - id: item-bff
+          uri: lb://item-bff
+          predicates:
+            - Path=/item-bff/**
+
         - id: inventory-bff
           uri: lb://inventory-bff
           predicates:
             - Path=/inventory-bff/**
+
 
 
 eureka:

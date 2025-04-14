@@ -23,6 +23,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/inventory-service/**",
+                                "/inventory-service/search",
                                 "/inventory-service/increase",
                                 "/inventory-service/decrease",
                                 "/inventory-service/history",

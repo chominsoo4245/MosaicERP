@@ -16,17 +16,6 @@ public class InventoryClient extends AbstractApiClient {
         super("http://inventory-service", webClientBuilder);
     }
 
-    public Mono<ApiResponse<InventoryDTO>> getInventoryDetail(Long inventoryId, String ip, String userAgent, String loginId) {
-        String uri = "/inventory-service/detail/" + inventoryId;
-        return webclient.get()
-                .uri(uri)
-                .header("X-Forwarded-For", ip)
-                .header("X-User-Agent", userAgent)
-                .header("X-User-Id", loginId)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<ApiResponse<InventoryDTO>>() {});
-    }
-
     public Mono<ApiResponse<List<InventoryDTO>>> getInventoryList(String ip, String userAgent, String loginId) {
         String uri = "/inventory-service/list";
         return webclient.get()
