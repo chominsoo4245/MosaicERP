@@ -17,6 +17,10 @@ const ItemListPage = () => {
         {label: "엑셀 다운로드", type: "download", onClick: () => console.log("다운로드")},
     ];
 
+    function handleDetail(index) {
+        navigate(`/items/detail/${index}`);
+    }
+
     const fetchItem = async () => {
         setLoading(true);
         const response = await getItemListAPI();
@@ -61,7 +65,7 @@ const ItemListPage = () => {
                     </thead>
                     <tbody>
                     {itemList.map((item, index) => (
-                        <tr key={item.itemId}>
+                        <tr key={item.itemId} onClick={ () => {handleDetail(item.itemId)}}>
                             <th className="border p-2">{item.itemId}</th>
                             <th className="border p-2">{item.code}</th>
                             <th className="border p-2">{item.name}</th>

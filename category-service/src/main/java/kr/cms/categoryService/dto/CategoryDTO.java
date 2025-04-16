@@ -14,6 +14,7 @@ public class CategoryDTO {
     private Long parentId;
     private String categoryType;
     private String categoryCode;
+    private String shortCode;
     private String name;
     private String description;
     private Integer level;

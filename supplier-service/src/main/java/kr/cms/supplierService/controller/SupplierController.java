@@ -48,34 +48,4 @@ public class SupplierController {
             return ApiResponse.fail("Failed to search suppliers: " + e.getMessage());
         }
     }
-
-    @PostMapping("/create")
-    public ApiResponse<Long> addSupplier(@RequestBody SupplierDTO dto){
-        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        try {
-            return supplierService.createSupplier(dto, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
-        } catch (Exception e){
-            return ApiResponse.fail("Failed to created supplier: " + e.getMessage());
-        }
-    }
-
-    @PutMapping("/update")
-    public ApiResponse<String> editSupplier(@RequestBody SupplierDTO dto) {
-        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        try {
-            return supplierService.updateSupplier(dto, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
-        } catch (Exception e){
-            return ApiResponse.fail("Failed to update supplier: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ApiResponse<String> removeSupplier(@PathVariable Long id) {
-        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        try {
-            return supplierService.deleteSupplier(id, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
-        } catch (Exception e){
-            return ApiResponse.fail("Failed to delete supplier: " + e.getMessage());
-        }
-    }
 }

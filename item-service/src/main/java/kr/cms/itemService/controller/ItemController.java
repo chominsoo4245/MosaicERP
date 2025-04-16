@@ -49,34 +49,4 @@ public class ItemController {
             return ApiResponse.fail("Failed to search items: " + e.getMessage());
         }
     }
-
-    @PostMapping("/create")
-    public ApiResponse<Long> addItem(@RequestBody ItemDTO itemDTO) {
-        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        try {
-            return itemService.createItem(itemDTO, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
-        } catch (Exception e) {
-            return ApiResponse.fail("Failed to create item: " + e.getMessage());
-        }
-    }
-
-    @PutMapping("/update")
-    public ApiResponse<String> editItem(@RequestBody ItemDTO itemDTO) {
-        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        try {
-            return itemService.updateItem(itemDTO, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
-        } catch (Exception e) {
-            return ApiResponse.fail("Failed to update item: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ApiResponse<String> removeItem(@PathVariable Long id) {
-        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        try {
-            return itemService.deleteItem(id, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
-        } catch (Exception e) {
-            return ApiResponse.fail("Failed to delete item: " + e.getMessage());
-        }
-    }
 }

@@ -37,6 +37,11 @@ spring:
           predicates:
             - Path=/item-service/**
 
+        - id: lot-service
+          uri: lb://lot-service
+          predicates:
+            - Path=/lot-service/**
+
         - id: supplier-service
           uri: lb://supplier-service
           predicates:

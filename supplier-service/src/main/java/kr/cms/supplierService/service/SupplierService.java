@@ -10,7 +10,4 @@ public interface SupplierService {
     ApiResponse<SupplierDTO> getSupplier(Long supplierId, String ip, String userAgent, String loginId);
     ApiResponse<List<SupplierDTO>> getAllSupplier(String ip, String userAgent, String loginId);
     ApiResponse<List<SupplierDTO>> getSearchSuppliers(SearchDataDTO dto, String ip, String userAgent, String loginId);
-    ApiResponse<Long> createSupplier(SupplierDTO supplierDTO, String ip, String userAgent, String loginId);
-    ApiResponse<String> updateSupplier(SupplierDTO supplierDTO, String ip, String userAgent, String loginId);
-    ApiResponse<String> deleteSupplier(Long supplierId, String ip, String userAgent, String loginId);
 }

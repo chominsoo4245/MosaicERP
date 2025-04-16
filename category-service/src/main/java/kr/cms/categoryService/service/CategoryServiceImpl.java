@@ -81,9 +81,15 @@ public class CategoryServiceImpl implements CategoryService {
     public ApiResponse<Long> createCategory(CategoryDTO categoryDTO, String ip, String userAgent, String loginId) {
         try {
             Category entity = convertToEntity(categoryDTO);
-            LocalDateTime time = LocalDateTime.now();
-            entity.setCreatedAt(time);
-            entity.setUpdatedAt(time);
+
+            String autoShortCode = (entity.getParentId() != null)
+                    ? generateSubCategoryShortCode(entity.getParentId(), categoryDTO.getCategoryType())
+                    : getTopCategoryCode(categoryDTO.getCategoryType());
+            entity.setShortCode(autoShortCode);
+            // 생성 시간
+            LocalDateTime now = LocalDateTime.now();
+            entity.setCreatedAt(now);
+            entity.setUpdatedAt(now);
             Category saved = categoryRepository.save(entity);
             logSender.sendLog("CREATE_CATEGORY_SUCCESS", "Category created successfully", ip, userAgent, loginId);
             return ApiResponse.success(saved.getId());
@@ -97,9 +103,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public ApiResponse<String> updateCategory(CategoryDTO categoryDTO, String ip, String userAgent, String loginId) {
         try {
-            categoryRepository.findById(categoryDTO.getId())
+            Category existing = categoryRepository.findById(categoryDTO.getId())
                     .orElseThrow(() -> new RuntimeException("Category not found"));
             Category entity = convertToEntity(categoryDTO);
+            entity.setShortCode(existing.getShortCode());
             entity.setUpdatedAt(LocalDateTime.now());
             categoryRepository.save(entity);
             logSender.sendLog("UPDATE_CATEGORY_SUCCESS", "Category updated successfully", ip, userAgent, loginId);
@@ -133,6 +140,7 @@ public class CategoryServiceImpl implements CategoryService {
         dto.setParentId(entity.getParentId());
         dto.setCategoryType(entity.getCategoryType());
         dto.setCategoryCode(entity.getCategoryCode());
+        dto.setShortCode(entity.getShortCode());
         dto.setName(entity.getName());
         dto.setDescription(entity.getDescription());
         dto.setLevel(entity.getLevel());
@@ -147,6 +155,7 @@ public class CategoryServiceImpl implements CategoryService {
         entity.setParentId(dto.getParentId());
         entity.setCategoryType(dto.getCategoryType());
         entity.setCategoryCode(dto.getCategoryCode());
+        entity.setShortCode(dto.getShortCode());
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
         entity.setLevel(dto.getLevel());
@@ -188,5 +197,97 @@ public class CategoryServiceImpl implements CategoryService {
                 && (dto.getCategoryType() == null || dto.getCategoryType().trim().isEmpty())
                 && (dto.getCategoryCode() == null || dto.getCategoryCode().trim().isEmpty())
                 && dto.getLevel() == null;
+    }
+
+    private String getTopCategoryCode(String categoryType) {
+        switch (categoryType.toUpperCase()) {
+            case "PRODUCT":
+            case "아이템":
+            case "제품":
+                return "PROD";
+            case "MATERIAL":
+            case "원자재":
+            case "재료":
+                return "MAT";
+            case "SERVICE":
+            case "서비스":
+                return "SERV";
+            case "PART":
+            case "부품":
+                return "PART";
+            case "ASSET":
+            case "자산":
+                return "ASST";
+            case "HUMAN_RESOURCE":
+            case "인사":
+            case "HR":
+                return "HR";
+            case "FINANCE":
+            case "재무":
+                return "FIN";
+            case "SALES":
+            case "영업":
+                return "SAL";
+            case "PURCHASE":
+            case "구매":
+                return "PUR";
+            case "INVENTORY":
+            case "재고":
+                return "INV";
+            case "PRODUCTION":
+            case "생산":
+                return "PRODCT";
+            case "LOGISTICS":
+            case "물류":
+                return "LOG";
+            case "CUSTOMER":
+            case "고객":
+                return "CUST";
+            case "SUPPLIER":
+            case "공급업체":
+                return "SUP";
+            case "QUALITY":
+            case "품질":
+                return "QUAL";
+            case "MAINTENANCE":
+            case "유지보수":
+                return "MAIN";
+            case "IT":
+            case "정보기술":
+                return "IT";
+            case "R&D":
+            case "연구개발":
+                return "RND";
+            case "MARKETING":
+            case "마케팅":
+                return "MARK";
+            case "ADMINISTRATION":
+            case "관리":
+                return "ADMIN";
+            case "LEGAL":
+            case "법무":
+                return "LEGAL";
+            case "CUSTOMS":
+            case "관세":
+                return "CUSTS";
+            case "SECURITY":
+            case "보안":
+                return "SEC";
+            case "LOGISTICS_PLANNING":
+            case "물류계획":
+                return "LOGPLAN";
+            case "PROCUREMENT":
+            case "조달":
+                return "PROC";
+            default:
+                throw new IllegalArgumentException("Unknown category type: " + categoryType);
+        }
+    }
+
+    private String generateSubCategoryShortCode(Long parentCategoryId, String parentCategoryType) {
+        String parentCode = getTopCategoryCode(parentCategoryType);
+        long childCount = categoryRepository.countByParentCategoryId(parentCategoryId);
+        String sequence = String.format("%03d", childCount + 1); // 3자리 번호
+        return parentCode + "-" + sequence;
     }
 }

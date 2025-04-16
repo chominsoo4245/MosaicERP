@@ -19,6 +19,10 @@ public class ItemAggregationService {
     private final CategoryClient categoryClient;
     private final SupplierClient supplierClient;
 
+    public ApiResponse<ItemDTO> getItemById(Long id, String ip, String userAgent, String loginId) {
+        return itemClient.getItem(id, ip, userAgent, loginId).block();
+    }
+
     public ApiResponse<List<AggregatedItemDTO>> getAggregatedItems(String ip, String userAgent, String loginId) {
         ApiResponse<List<ItemDTO>> itemResponse = itemClient.getItemList(ip, userAgent, loginId).block();
         ApiResponse<List<CategoryDTO>> categoryResponse = categoryClient.getCategoryList(ip, userAgent, loginId).block();
@@ -75,11 +79,5 @@ public class ItemAggregationService {
                         supplierResponse.getData()
                 )
         );
-    }
-
-    public ApiResponse<Long> createItem(ItemDTO itemDTO, String ip, String userAgent, String loginId){
-        ApiResponse<Long> response = itemClient.createItem(itemDTO, ip, userAgent, loginId).block();
-        if(!response.isSuccess() || response == null) return ApiResponse.fail("관리자에게 문의바랍니다.");
-        return response;
     }
 }

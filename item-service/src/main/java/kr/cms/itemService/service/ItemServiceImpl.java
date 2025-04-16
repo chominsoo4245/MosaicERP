@@ -7,15 +7,18 @@ import kr.cms.itemService.dto.SearchDataDTO;
 import kr.cms.itemService.entity.Item;
 import kr.cms.itemService.logging.LogSender;
 import kr.cms.itemService.repository.ItemRepository;
+import kr.cms.itemService.util.DataUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static kr.cms.itemService.util.DataUtil.convertToEntity;
+import static kr.cms.itemService.util.DataUtil.convertToDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +46,7 @@ public class ItemServiceImpl implements ItemService {
         try {
             List<Item> itemList = itemRepository.findAll();
             List<ItemDTO> dtoList = itemList.stream()
-                    .map(this::convertToDTO)
+                    .map(DataUtil::convertToDTO)
                     .collect(Collectors.toList());
             logSender.sendLog("GET_ALL_ITEMS_SUCCESS", "All items retrieved successfully", ip, userAgent, loginId);
             return ApiResponse.success(dtoList);
@@ -63,7 +66,7 @@ public class ItemServiceImpl implements ItemService {
             Specification<Item> spec = createSpecification(searchDataDTO);
             List<Item> itemList = itemRepository.findAll(spec);
             List<ItemDTO> dtoList = itemList.stream()
-                    .map(this::convertToDTO)
+                    .map(DataUtil::convertToDTO)
                     .collect(Collectors.toList());
             logSender.sendLog("SEARCH_ITEMS_SUCCESS", "Items searched successfully", ip, userAgent, loginId);
             return ApiResponse.success(dtoList);
@@ -73,7 +76,6 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    @Override
     @Transactional
     public ApiResponse<Long> createItem(ItemDTO itemDTO, String ip, String userAgent, String loginId) {
 
@@ -92,7 +94,6 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    @Override
     @Transactional
     public ApiResponse<String> updateItem(ItemDTO itemDTO, String ip, String userAgent, String loginId) {
         try {
@@ -109,7 +110,6 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    @Override
     @Transactional
     public ApiResponse<String> deleteItem(Long itemId, String ip, String userAgent, String loginId) {
         try {
@@ -122,40 +122,6 @@ public class ItemServiceImpl implements ItemService {
         } catch (Exception e) {logSender.sendLog("DELETE_ITEM_FAIL", "Failed to delete item: " + e.getMessage(), ip, userAgent, loginId);
             throw e;
         }
-    }
-
-    private Item convertToEntity(ItemDTO dto) {
-        Item entity = new Item();
-        entity.setItemId(entity.getItemId());
-        entity.setCategoryId(dto.getCategoryId());
-        entity.setCode(dto.getCode());
-        entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
-        entity.setUnit(dto.getUnit());
-        entity.setCost(dto.getCost());
-        entity.setPrice(dto.getPrice());
-        entity.setIsLotTracked(dto.getIsLotTracked() != null ? dto.getIsLotTracked() : false);
-        entity.setDefaultSupplierId(dto.getDefaultSupplierId());
-        entity.setCreatedAt(dto.getCreatedAt());
-        entity.setUpdatedAt(dto.getUpdatedAt());
-        return entity;
-    }
-
-    private ItemDTO convertToDTO(Item entity) {
-        ItemDTO dto = new ItemDTO();
-        dto.setItemId(entity.getItemId());
-        dto.setCategoryId(entity.getCategoryId());
-        dto.setCode(entity.getCode());
-        dto.setName(entity.getName());
-        dto.setDescription(entity.getDescription());
-        dto.setUnit(entity.getUnit());
-        dto.setCost(entity.getCost());
-        dto.setPrice(entity.getPrice());
-        dto.setIsLotTracked(entity.getIsLotTracked() != null ? entity.getIsLotTracked() : false);
-        dto.setDefaultSupplierId(entity.getDefaultSupplierId());
-        dto.setCreatedAt(entity.getCreatedAt());
-        dto.setUpdatedAt(entity.getUpdatedAt());
-        return dto;
     }
 
     private boolean isAllFieldsNull(SearchDataDTO searchDataDTO) {

@@ -16,6 +16,7 @@ include("inventory-service")
 include("outbound-service")
 include("category-service")
 include("supplier-service")
+include("serial-service")
 
 // erp micro bff
 include("item-bff")

@@ -22,6 +22,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/item-bff/**",
                                 "/item-bff/aggregated",
                                 "/item-bff/form-init",
                                 "/item-bff/add",

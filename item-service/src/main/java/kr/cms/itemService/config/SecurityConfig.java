@@ -22,12 +22,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/item-service/detail/**",
+                                "/item-service/**",
                                 "/item-service/list",
                                 "/item-service/search",
-                                "/item-service/create",
-                                "/item-service/delete",
-                                "/item-service/update",
+                                "/item-service/try/**/**",
+                                "/item-service/confirm/**/**",
+                                "/item-service/cancel/**/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"

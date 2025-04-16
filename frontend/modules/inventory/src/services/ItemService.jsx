@@ -5,6 +5,11 @@ export const getItemListAPI = async () => {
     return response.data;
 }
 
+export const getItemAPI = async (id) => {
+    const response = await api.get(`/item-bff/${id}`);
+    return response.data;
+}
+
 export const getFormInitDataAPI = async () => {
     const response = await api.get("/item-bff/form-init");
     return response.data;

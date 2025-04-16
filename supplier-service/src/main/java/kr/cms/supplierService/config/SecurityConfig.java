@@ -25,9 +25,9 @@ public class SecurityConfig {
                                 "/supplier-service/**",
                                 "/supplier-service/list",
                                 "/supplier-service/search",
-                                "/supplier-service/create",
-                                "/supplier-service/delete",
-                                "/supplier-service/update",
+                                "/supplier-service/try/**",
+                                "/supplier-service/confirm/**",
+                                "/supplier-service/cancel/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"

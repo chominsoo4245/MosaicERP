@@ -21,8 +21,14 @@ public class ItemBFFController {
     private final ItemAggregationService itemAggregationService;
     private final HeaderProvider headerProvider;
 
+    @GetMapping("/{id}")
+    public ApiResponse<ItemDTO> getItemById(@PathVariable Long id) {
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
+        return itemAggregationService.getItemById(id, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
+    }
+
     @GetMapping("/aggregated")
-    public ApiResponse<List<AggregatedItemDTO>> getAggregatedItems(){
+    public ApiResponse<List<AggregatedItemDTO>> getAggregatedItems() {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         return itemAggregationService.getAggregatedItems(headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
@@ -34,7 +40,13 @@ public class ItemBFFController {
     }
 
     @PostMapping("/add")
-    public ApiResponse<String> addItem(@RequestBody ItemDTO dto){
+    public ApiResponse<Long> addItem(@RequestBody ItemDTO dto) {
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
+        return itemAggregationService.createItem(dto, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
+    }
+
+    @PostMapping("/edit")
+    public ApiResponse<Long> editItem(@RequestBody ItemDTO dto) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         return itemAggregationService.createItem(dto, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
     }
