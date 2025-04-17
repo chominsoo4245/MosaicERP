@@ -22,4 +22,6 @@ public class InventoryHistoryDTO {
     private LocalDateTime transactionDate;
     private String originRef;
     private String operator;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

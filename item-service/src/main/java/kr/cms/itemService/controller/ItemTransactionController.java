@@ -17,11 +17,15 @@ public class ItemTransactionController {
     private final ItemTransactionService transactionService;
     private final HeaderProvider headerProvider;
 
-    @PostMapping("/try/create")
-    public ApiResponse<String> tryCreateItem(@RequestBody ItemDTO itemDTO) {
+    @PostMapping("/try/create/{transactionId}")
+    public ApiResponse<String> tryCreateItem(
+            @PathVariable String transactionId,
+            @RequestBody ItemDTO itemDTO
+    ) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         try {
             return transactionService.tryCreateItem(
+                    transactionId,
                     itemDTO,
                     headerInfoDTO.getIp(),
                     headerInfoDTO.getUserAgent(),
@@ -62,11 +66,15 @@ public class ItemTransactionController {
         }
     }
 
-    @PostMapping("/try/update")
-    public ApiResponse<String> tryUpdateItem(@RequestBody ItemDTO itemDTO) {
+    @PostMapping("/try/update/{transactionId}")
+    public ApiResponse<String> tryUpdateItem(
+            @PathVariable String transactionId,
+            @RequestBody ItemDTO itemDTO
+    ) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         try {
             return transactionService.tryUpdateItem(
+                    transactionId,
                     itemDTO,
                     headerInfoDTO.getIp(),
                     headerInfoDTO.getUserAgent(),
@@ -107,11 +115,15 @@ public class ItemTransactionController {
         }
     }
 
-    @PostMapping("/try/delete/{itemId}")
-    public ApiResponse<String> tryDeleteItem(@PathVariable Long itemId) {
+    @PostMapping("/try/delete/{transactionId}/{itemId}")
+    public ApiResponse<String> tryDeleteItem(
+            @PathVariable String transactionId,
+            @PathVariable Long itemId
+    ) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         try {
             return transactionService.tryDeleteItem(
+                    transactionId,
                     itemId,
                     headerInfoDTO.getIp(),
                     headerInfoDTO.getUserAgent(),

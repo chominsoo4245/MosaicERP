@@ -16,11 +16,14 @@ public class LotTransactionController {
     private final LotTransactionService transactionService;
     private final HeaderProvider headerProvider;
 
-    @PostMapping("/try/create")
-    public ApiResponse<String> tryCreateLot(@RequestBody LotDTO lotDTO) {
+    @PostMapping("/try/create/{transactionId}")
+    public ApiResponse<String> tryCreateLot(
+            @PathVariable String transactionId,
+            @RequestBody LotDTO lotDTO) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         try {
             return transactionService.tryCreateLot(
+                    transactionId,
                     lotDTO,
                     headerInfoDTO.getIp(),
                     headerInfoDTO.getUserAgent(),
@@ -32,11 +35,12 @@ public class LotTransactionController {
     }
 
     @PostMapping("/confirm/create/{transactionId}")
-    public ApiResponse<String> confirmCreateLot(@PathVariable String transactionId) {
+    public ApiResponse<String> confirmCreateLot(@PathVariable String transactionId, @RequestBody LotDTO lotDTO) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         try {
             return transactionService.confirmCreateLot(
                     transactionId,
+                    lotDTO,
                     headerInfoDTO.getIp(),
                     headerInfoDTO.getUserAgent(),
                     headerInfoDTO.getLoginId()
@@ -61,11 +65,15 @@ public class LotTransactionController {
         }
     }
 
-    @PostMapping("/try/update")
-    public ApiResponse<String> tryUpdateLot(@RequestBody LotDTO lotDTO) {
+    @PostMapping("/try/update/{transactionId}")
+    public ApiResponse<String> tryUpdateLot(
+            @PathVariable String transactionId,
+            @RequestBody LotDTO lotDTO
+    ) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         try {
             return transactionService.tryUpdateLot(
+                    transactionId,
                     lotDTO,
                     headerInfoDTO.getIp(),
                     headerInfoDTO.getUserAgent(),
@@ -106,11 +114,14 @@ public class LotTransactionController {
         }
     }
 
-    @PostMapping("/try/delete/{lotId}")
-    public ApiResponse<String> tryDeleteLot(@PathVariable Long lotId) {
+    @PostMapping("/try/delete/{transactionId}/{lotId}")
+    public ApiResponse<String> tryDeleteLot(
+            @PathVariable String transactionId,
+            @PathVariable Long lotId) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         try {
             return transactionService.tryDeleteLot(
+                    transactionId,
                     lotId,
                     headerInfoDTO.getIp(),
                     headerInfoDTO.getUserAgent(),

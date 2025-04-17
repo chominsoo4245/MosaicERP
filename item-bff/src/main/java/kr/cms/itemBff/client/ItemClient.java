@@ -40,6 +40,19 @@ public class ItemClient extends AbstractApiClient {
                 });
     }
 
+    public Mono<ApiResponse<String>> tryCreateItem(String transactionId,ItemDTO itemDTO, String ip, String userAgent, String loginId) {
+        String uri = "/item-service/try/create/" + transactionId;
+        return webclient.post()
+                .uri(uri)
+                .header("X-Forwarded-For", ip)
+                .header("X-User-Agent", userAgent)
+                .header("X-User-Id", loginId)
+                .bodyValue(itemDTO)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<ApiResponse<String>>() {
+                });
+    }
+
     public Mono<ApiResponse<String>> confirmCreateItem(String transactionId, String ip, String userAgent, String loginId) {
         String uri = "/item-service/confirm/create/" + transactionId;
         return webclient.post()
@@ -64,8 +77,8 @@ public class ItemClient extends AbstractApiClient {
                 });
     }
 
-    public Mono<ApiResponse<String>> tryUpdateItem(ItemDTO itemDTO, String ip, String userAgent, String loginId) {
-        String uri = "/item-service/try/update";
+    public Mono<ApiResponse<String>> tryUpdateItem(String transactionId, ItemDTO itemDTO, String ip, String userAgent, String loginId) {
+        String uri = "/item-service/try/update/" + transactionId;
         return webclient.post()
                 .uri(uri)
                 .header("X-Forwarded-For", ip)
@@ -101,8 +114,8 @@ public class ItemClient extends AbstractApiClient {
                 });
     }
 
-    public Mono<ApiResponse<String>> tryDeleteItem(String transactionId, String ip, String userAgent, String loginId) {
-        String uri = "/item-service/try/delete/" + transactionId;
+    public Mono<ApiResponse<String>> tryDeleteItem(String transactionId, Long itemId, String ip, String userAgent, String loginId) {
+        String uri = "/item-service/try/delete/" + transactionId + "/" + itemId;
         return webclient.post()
                 .uri(uri)
                 .header("X-Forwarded-For", ip)

@@ -16,11 +16,14 @@ public class SerialTransactionController {
     private final SerialTransactionService transactionService;
     private final HeaderProvider headerProvider;
 
-    @PostMapping("/try/create")
-    public ApiResponse<String> tryCreateSerial(@RequestBody SerialDTO serialDTO) {
+    @PostMapping("/try/create/{transactionId}")
+    public ApiResponse<String> tryCreateSerial(
+            @PathVariable String transactionId,
+            @RequestBody SerialDTO serialDTO) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         try {
             return transactionService.tryCreateSerial(
+                    transactionId,
                     serialDTO,
                     headerInfoDTO.getIp(),
                     headerInfoDTO.getUserAgent(),
@@ -32,11 +35,12 @@ public class SerialTransactionController {
     }
 
     @PostMapping("/confirm/create/{transactionId}")
-    public ApiResponse<String> confirmCreateSerial(@PathVariable String transactionId) {
+    public ApiResponse<String> confirmCreateSerial(@PathVariable String transactionId, @RequestBody SerialDTO serialDTO) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         try {
             return transactionService.confirmCreateSerial(
                     transactionId,
+                    serialDTO,
                     headerInfoDTO.getIp(),
                     headerInfoDTO.getUserAgent(),
                     headerInfoDTO.getLoginId()
@@ -61,11 +65,12 @@ public class SerialTransactionController {
         }
     }
 
-    @PostMapping("/try/update")
-    public ApiResponse<String> tryUpdateSerial(@RequestBody SerialDTO serialDTO) {
+    @PostMapping("/try/update/{transactionId}")
+    public ApiResponse<String> tryUpdateSerial(@PathVariable String transactionId, @RequestBody SerialDTO serialDTO) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         try {
             return transactionService.tryUpdateSerial(
+                    transactionId,
                     serialDTO,
                     headerInfoDTO.getIp(),
                     headerInfoDTO.getUserAgent(),
@@ -106,11 +111,12 @@ public class SerialTransactionController {
         }
     }
 
-    @PostMapping("/try/delete/{serialId}")
-    public ApiResponse<String> tryDeleteSerial(@PathVariable Long serialId) {
+    @PostMapping("/try/delete/{transactionId}/{serialId}")
+    public ApiResponse<String> tryDeleteSerial(@PathVariable String transactionId, @PathVariable Long serialId) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         try {
             return transactionService.tryDeleteSerial(
+                    transactionId,
                     serialId,
                     headerInfoDTO.getIp(),
                     headerInfoDTO.getUserAgent(),

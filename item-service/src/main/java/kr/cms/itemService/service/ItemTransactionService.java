@@ -45,8 +45,7 @@ public class ItemTransactionService {
         return transaction;
     }
 
-    private String createTransaction(String operation, String itemData, String originalData) {
-        String transactionId = UUID.randomUUID().toString();
+    private void createTransaction(String transactionId, String operation, String itemData, String originalData) {
         ItemTransaction transaction = new ItemTransaction();
         transaction.setTransactionId(transactionId);
         transaction.setItemData(itemData);
@@ -57,7 +56,6 @@ public class ItemTransactionService {
         transaction.setCreatedAt(now);
         transaction.setExpireAt(now.plusMinutes(10));
         transactionRepository.save(transaction);
-        return transactionId;
     }
 
     private void sendLog(String action, String description, String ip, String userAgent, String loginId) {
@@ -69,13 +67,13 @@ public class ItemTransactionService {
     }
     
     @Transactional
-    public ApiResponse<String> tryCreateItem(ItemDTO itemDTO, String ip, String userAgent, String loginId){
+    public ApiResponse<String> tryCreateItem(String transactionId, ItemDTO itemDTO, String ip, String userAgent, String loginId){
         try {
 
             validateItemData(itemDTO);
 
             String itemData = objectMapper.writeValueAsString(itemDTO);
-            String transactionId = createTransaction("CREATE", itemData, null);
+            createTransaction(transactionId, "CREATE", itemData, null);
             sendLog("TRY_CREATE_ITEM", "Item creation prepared", ip, userAgent, loginId);
             return ApiResponse.success(transactionId);
         } catch (Exception e) {
@@ -102,7 +100,7 @@ public class ItemTransactionService {
             transaction.setResultId(saved.getItemId().toString());
             transactionRepository.save(transaction);
             sendLog("CONFIRM_CREATE_ITEM", "Item created successfully", ip, userAgent, loginId);
-            return ApiResponse.successWithMessage("Item created with ID: " + saved.getItemId());
+            return ApiResponse.success(saved.getItemId().toString());
         } catch (Exception e) {
             sendLog("CONFIRM_CREATE_ITEM_FAIL", "Failed to confirm item creation: " + e.getMessage(), ip, userAgent, loginId);
             throw new RuntimeException("Failed to confirm item creation: " + e.getMessage(), e);
@@ -125,7 +123,7 @@ public class ItemTransactionService {
     }
 
     @Transactional
-    public ApiResponse<String> tryUpdateItem(ItemDTO itemDTO, String ip, String userAgent, String loginId) {
+    public ApiResponse<String> tryUpdateItem(String transactionId, ItemDTO itemDTO, String ip, String userAgent, String loginId) {
         try {
             Item existingItem = itemRepository.findById(itemDTO.getItemId())
                     .orElseThrow(() -> new RuntimeException("Item not found"));
@@ -134,7 +132,7 @@ public class ItemTransactionService {
             ItemDTO originalItemDTO = convertToDTO(existingItem);
             String itemData = objectMapper.writeValueAsString(itemDTO);
             String originalData = objectMapper.writeValueAsString(originalItemDTO);
-            String transactionId = createTransaction("UPDATE", itemData, originalData);
+            createTransaction(transactionId, "UPDATE", itemData, originalData);
 
             sendLog("TRY_UPDATE_ITEM", "Item update prepared", ip, userAgent, loginId);
             return ApiResponse.success(transactionId);
@@ -151,7 +149,7 @@ public class ItemTransactionService {
             ItemDTO itemDTO = objectMapper.readValue(transaction.getItemData(), ItemDTO.class);
             Item entity = convertToEntity(itemDTO);
             entity.setUpdatedAt(LocalDateTime.now());
-            itemRepository.save(entity);
+            Item updated = itemRepository.save(entity);
 
             transaction.setStatus(TransactionStatus.CONFIRMED);
             transaction.setCompletedAt(LocalDateTime.now());
@@ -159,7 +157,7 @@ public class ItemTransactionService {
             transactionRepository.save(transaction);
 
             sendLog("CONFIRM_UPDATE_ITEM", "Item updated successfully", ip, userAgent, loginId);
-            return ApiResponse.successWithMessage("Item updated successfully");
+            return ApiResponse.success(updated.getItemId().toString());
         } catch (Exception e) {
             sendLog("CONFIRM_UPDATE_ITEM_FAIL", "Failed to confirm item update: " + e.getMessage(), ip, userAgent, loginId);
             throw new RuntimeException("Failed to confirm item update: " + e.getMessage(), e);
@@ -183,12 +181,12 @@ public class ItemTransactionService {
     }
 
     @Transactional
-    public ApiResponse<String> tryDeleteItem(Long itemId, String ip, String userAgent, String loginId) {
+    public ApiResponse<String> tryDeleteItem(String transactionId, Long itemId, String ip, String userAgent, String loginId) {
         try {
             Item item = itemRepository.findById(itemId)
                     .orElseThrow(() -> new RuntimeException("Item not found"));
             String itemData = objectMapper.writeValueAsString(convertToDTO(item));
-            String transactionId = createTransaction("DELETE", itemData, null);
+            createTransaction(transactionId, "DELETE", itemData, null);
             sendLog("TRY_DELETE_ITEM", "Item deletion prepared", ip, userAgent, loginId);
             return ApiResponse.success(transactionId);
         } catch (Exception e) {
@@ -209,7 +207,7 @@ public class ItemTransactionService {
             transactionRepository.save(transaction);
 
             sendLog("CONFIRM_DELETE_ITEM", "Item deleted successfully", ip, userAgent, loginId);
-            return ApiResponse.successWithMessage("Item deleted successfully");
+            return ApiResponse.success(itemDTO.getItemId().toString());
         } catch (Exception e) {
             sendLog("CONFIRM_DELETE_ITEM_FAIL", "Failed to confirm item deletion: " + e.getMessage(), ip, userAgent, loginId);
             throw new RuntimeException("Failed to confirm item deletion: " + e.getMessage(), e);

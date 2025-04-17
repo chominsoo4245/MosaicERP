@@ -4,12 +4,14 @@ import kr.cms.common.dto.ApiResponse;
 import kr.cms.common.dto.HeaderInfoDTO;
 import kr.cms.common.extractor.HeaderExtractor;
 import kr.cms.common.provider.HeaderProvider;
-import kr.cms.itemBff.dto.AggregatedItemDTO;
-import kr.cms.itemBff.dto.ItemDTO;
-import kr.cms.itemBff.dto.ItemFormInitDTO;
-import kr.cms.itemBff.service.ItemAggregationService;
+import kr.cms.itemBff.dto.CreateItemRequest;
+import kr.cms.itemBff.dto.CreateItemResponse;
+import kr.cms.itemBff.dto.FormDataInitDTO;
+import kr.cms.itemBff.dto.ItemListResponseDTO;
+import kr.cms.itemBff.service.ItemBFFService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -18,37 +20,24 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemBFFController {
 
-    private final ItemAggregationService itemAggregationService;
+    private final ItemBFFService itemBffService;
     private final HeaderProvider headerProvider;
 
-    @GetMapping("/{id}")
-    public ApiResponse<ItemDTO> getItemById(@PathVariable Long id) {
+    @GetMapping("/formDataInit")
+    public Mono<ApiResponse<FormDataInitDTO>> getFormDataInit() {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        return itemAggregationService.getItemById(id, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
+        return itemBffService.getFormDataInit(headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getIp());
     }
 
-    @GetMapping("/aggregated")
-    public ApiResponse<List<AggregatedItemDTO>> getAggregatedItems() {
+    @GetMapping("/getItemList")
+    public Mono<ApiResponse<List<ItemListResponseDTO>>> getItemList() {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        return itemAggregationService.getAggregatedItems(headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
+        return itemBffService.getItemList(headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getIp());
     }
 
-    @GetMapping("/form-init")
-    public ApiResponse<ItemFormInitDTO> getFormInitData() {
+    @PostMapping("/create")
+    public Mono<ApiResponse<CreateItemResponse>> createItem(@RequestBody CreateItemRequest request) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        return itemAggregationService.getFormInitData(headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
+        return itemBffService.createItem(request, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getIp());
     }
-
-    @PostMapping("/add")
-    public ApiResponse<Long> addItem(@RequestBody ItemDTO dto) {
-        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        return itemAggregationService.createItem(dto, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
-    }
-
-    @PostMapping("/edit")
-    public ApiResponse<Long> editItem(@RequestBody ItemDTO dto) {
-        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        return itemAggregationService.createItem(dto, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
-    }
-
 }

@@ -44,8 +44,7 @@ public class LotTransactionService {
         return transaction;
     }
 
-    private String createTransaction(String operation, String lotData, String originalData) {
-        String transactionId = UUID.randomUUID().toString();
+    private void createTransaction(String transactionId, String operation, String lotData, String originalData) {
         LotTransaction transaction = new LotTransaction();
         transaction.setTransactionId(transactionId);
         transaction.setLotData(lotData);
@@ -56,7 +55,6 @@ public class LotTransactionService {
         transaction.setCreatedAt(now);
         transaction.setExpireAt(now.plusMinutes(10));
         transactionRepository.save(transaction);
-        return transactionId;
     }
 
     private void sendLog(String action, String description, String ip, String userAgent, String loginId) {
@@ -68,11 +66,11 @@ public class LotTransactionService {
     }
 
     @Transactional
-    public ApiResponse<String> tryCreateLot(LotDTO lotDTO, String ip, String userAgent, String loginId){
+    public ApiResponse<String> tryCreateLot(String transactionId, LotDTO lotDTO, String ip, String userAgent, String loginId){
         try{
             validateLotData(lotDTO);
             String lotData = objectMapper.writeValueAsString(lotDTO);
-            String transactionId = createTransaction("CREATE", lotData, null);
+            createTransaction(transactionId,"CREATE", lotData, null);
             sendLog("TRY_CREATE_SUPPLIER", "lot creation prepared", ip, userAgent, loginId);
             return ApiResponse.success(transactionId);
         }catch (Exception e){
@@ -82,11 +80,18 @@ public class LotTransactionService {
     }
 
     @Transactional
-    public ApiResponse<String> confirmCreateLot(String transactionId, String ip, String userAgent, String loginId){
-        try{
+    public ApiResponse<String> confirmCreateLot(String transactionId, LotDTO resLotDTO, String ip, String userAgent, String loginId) {
+        try {
             LotTransaction transaction = getValidTransaction(transactionId);
 
             LotDTO lotDTO = objectMapper.readValue(transaction.getLotData(), LotDTO.class);
+            lotDTO.setItemId(resLotDTO.getItemId());
+            lotDTO.setLotNumber(resLotDTO.getLotNumber());
+
+            transaction.setLotData(objectMapper.writeValueAsString(lotDTO));
+            transactionRepository.save(transaction);
+
+            // 엔티티 변환 및 저장
             Lot entity = convertToEntity(lotDTO);
             LocalDateTime now = LocalDateTime.now();
             entity.setLotId(null);
@@ -98,10 +103,12 @@ public class LotTransactionService {
             transaction.setCompletedAt(now);
             transaction.setResultId(saved.getLotId().toString());
             transactionRepository.save(transaction);
-            sendLog("CONFIRM_CREATE_SUPPLIER", "Lot created successfully", ip, userAgent, loginId);
-            return ApiResponse.successWithMessage("Lot created with ID: " + saved.getLotId());
-        }catch (Exception e){
-            sendLog("CONFIRM_CREATE_SUPPLIER_FAIL", "Failed to confirm lot creation: " + e.getMessage(), ip, userAgent, loginId);
+
+            sendLog("CONFIRM_CREATE_LOT", "Lot created successfully with ID: " + saved.getLotId() + " for item: " + resLotDTO.getItemId(),
+                    ip, userAgent, loginId);
+            return ApiResponse.success(saved.getLotId().toString());
+        } catch (Exception e) {
+            sendLog("CONFIRM_CREATE_LOT_FAIL", "Failed to confirm lot creation: " + e.getMessage(), ip, userAgent, loginId);
             throw new RuntimeException("Failed to confirm lot creation: " + e.getMessage(), e);
         }
     }
@@ -122,7 +129,7 @@ public class LotTransactionService {
     }
 
     @Transactional
-    public ApiResponse<String> tryUpdateLot(LotDTO lotDTO, String ip, String userAgent, String loginId) {
+    public ApiResponse<String> tryUpdateLot(String transactionId, LotDTO lotDTO, String ip, String userAgent, String loginId) {
         try {
             Lot existingLot = lotRepository.findById(lotDTO.getLotId())
                     .orElseThrow(() -> new RuntimeException("Lot not found"));
@@ -131,7 +138,7 @@ public class LotTransactionService {
             LotDTO originalLotDTO = convertToDTO(existingLot);
             String lotData = objectMapper.writeValueAsString(lotDTO);
             String originalData = objectMapper.writeValueAsString(originalLotDTO);
-            String transactionId = createTransaction("UPDATE", lotData, originalData);
+            createTransaction(transactionId,"UPDATE", lotData, originalData);
 
             sendLog("TRY_UPDATE_SUPPLIER", "Lot update prepared", ip, userAgent, loginId);
             return ApiResponse.success(transactionId);
@@ -148,7 +155,7 @@ public class LotTransactionService {
             LotDTO lotDTO = objectMapper.readValue(transaction.getLotData(), LotDTO.class);
             Lot entity = convertToEntity(lotDTO);
             entity.setUpdatedAt(LocalDateTime.now());
-            lotRepository.save(entity);
+            Lot updated = lotRepository.save(entity);
 
             transaction.setStatus(TransactionStatus.CONFIRMED);
             transaction.setCompletedAt(LocalDateTime.now());
@@ -156,7 +163,7 @@ public class LotTransactionService {
             transactionRepository.save(transaction);
 
             sendLog("CONFIRM_UPDATE_SUPPLIER", "Lot updated successfully", ip, userAgent, loginId);
-            return ApiResponse.successWithMessage("Lot updated successfully");
+            return ApiResponse.success(updated.getLotId().toString());
         } catch (Exception e) {
             sendLog("CONFIRM_UPDATE_SUPPLIER_FAIL", "Failed to confirm lot update: " + e.getMessage(), ip, userAgent, loginId);
             throw new RuntimeException("Failed to confirm lot update: " + e.getMessage(), e);
@@ -180,12 +187,12 @@ public class LotTransactionService {
     }
 
     @Transactional
-    public ApiResponse<String> tryDeleteLot(Long lotId, String ip, String userAgent, String loginId) {
+    public ApiResponse<String> tryDeleteLot(String transactionId, Long lotId, String ip, String userAgent, String loginId) {
         try {
             Lot lot = lotRepository.findById(lotId)
                     .orElseThrow(() -> new RuntimeException("Lot not found"));
             String lotData = objectMapper.writeValueAsString(convertToDTO(lot));
-            String transactionId = createTransaction("DELETE", lotData, null);
+            createTransaction(transactionId, "DELETE", lotData, null);
             sendLog("TRY_DELETE_SUPPLIER", "Lot deletion prepared", ip, userAgent, loginId);
             return ApiResponse.success(transactionId);
         } catch (Exception e) {

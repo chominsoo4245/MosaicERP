@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static kr.cms.serialService.util.DataUtil.convertToDTO;
 import static kr.cms.serialService.util.DataUtil.convertToEntity;
@@ -44,8 +43,7 @@ public class SerialTransactionService {
         return transaction;
     }
 
-    private String createTransaction(String operation, String serialData, String originalData) {
-        String transactionId = UUID.randomUUID().toString();
+    private void createTransaction(String transactionId, String operation, String serialData, String originalData) {
         SerialTransaction transaction = new SerialTransaction();
         transaction.setTransactionId(transactionId);
         transaction.setSerialData(serialData);
@@ -56,7 +54,6 @@ public class SerialTransactionService {
         transaction.setCreatedAt(now);
         transaction.setExpireAt(now.plusMinutes(10));
         transactionRepository.save(transaction);
-        return transactionId;
     }
 
     private void sendLog(String action, String description, String ip, String userAgent, String loginId) {
@@ -68,11 +65,11 @@ public class SerialTransactionService {
     }
 
     @Transactional
-    public ApiResponse<String> tryCreateSerial(SerialDTO serialDTO, String ip, String userAgent, String loginId){
+    public ApiResponse<String> tryCreateSerial(String transactionId, SerialDTO serialDTO, String ip, String userAgent, String loginId){
         try{
             validateSerialData(serialDTO);
             String serialData = objectMapper.writeValueAsString(serialDTO);
-            String transactionId = createTransaction("CREATE", serialData, null);
+            createTransaction(transactionId,"CREATE", serialData, null);
             sendLog("TRY_CREATE_SUPPLIER", "serial creation prepared", ip, userAgent, loginId);
             return ApiResponse.success(transactionId);
         }catch (Exception e){
@@ -82,11 +79,17 @@ public class SerialTransactionService {
     }
 
     @Transactional
-    public ApiResponse<String> confirmCreateSerial(String transactionId, String ip, String userAgent, String loginId){
+    public ApiResponse<String> confirmCreateSerial(String transactionId, SerialDTO resSerialDTO, String ip, String userAgent, String loginId){
         try{
             SerialTransaction transaction = getValidTransaction(transactionId);
 
             SerialDTO serialDTO = objectMapper.readValue(transaction.getSerialData(), SerialDTO.class);
+            serialDTO.setItemId(resSerialDTO.getItemId());
+            serialDTO.setLotId(resSerialDTO.getLotId());
+            serialDTO.setSerialNumber(resSerialDTO.getSerialNumber());
+            transaction.setSerialData(objectMapper.writeValueAsString(serialDTO));
+            transactionRepository.save(transaction);
+
             Serial entity = convertToEntity(serialDTO);
             LocalDateTime now = LocalDateTime.now();
             entity.setSerialId(null);
@@ -99,7 +102,7 @@ public class SerialTransactionService {
             transaction.setResultId(saved.getSerialId().toString());
             transactionRepository.save(transaction);
             sendLog("CONFIRM_CREATE_SUPPLIER", "Serial created successfully", ip, userAgent, loginId);
-            return ApiResponse.successWithMessage("Serial created with ID: " + saved.getSerialId());
+            return ApiResponse.success(saved.getSerialId().toString());
         }catch (Exception e){
             sendLog("CONFIRM_CREATE_SUPPLIER_FAIL", "Failed to confirm serial creation: " + e.getMessage(), ip, userAgent, loginId);
             throw new RuntimeException("Failed to confirm serial creation: " + e.getMessage(), e);
@@ -122,7 +125,7 @@ public class SerialTransactionService {
     }
 
     @Transactional
-    public ApiResponse<String> tryUpdateSerial(SerialDTO serialDTO, String ip, String userAgent, String loginId) {
+    public ApiResponse<String> tryUpdateSerial(String transactionId, SerialDTO serialDTO, String ip, String userAgent, String loginId) {
         try {
             Serial existingSerial = serialRepository.findById(serialDTO.getSerialId())
                     .orElseThrow(() -> new RuntimeException("Serial not found"));
@@ -131,7 +134,7 @@ public class SerialTransactionService {
             SerialDTO originalSerialDTO = convertToDTO(existingSerial);
             String serialData = objectMapper.writeValueAsString(serialDTO);
             String originalData = objectMapper.writeValueAsString(originalSerialDTO);
-            String transactionId = createTransaction("UPDATE", serialData, originalData);
+            createTransaction(transactionId,"UPDATE", serialData, originalData);
 
             sendLog("TRY_UPDATE_SUPPLIER", "Serial update prepared", ip, userAgent, loginId);
             return ApiResponse.success(transactionId);
@@ -148,7 +151,7 @@ public class SerialTransactionService {
             SerialDTO serialDTO = objectMapper.readValue(transaction.getSerialData(), SerialDTO.class);
             Serial entity = convertToEntity(serialDTO);
             entity.setUpdatedAt(LocalDateTime.now());
-            serialRepository.save(entity);
+            Serial updated = serialRepository.save(entity);
 
             transaction.setStatus(TransactionStatus.CONFIRMED);
             transaction.setCompletedAt(LocalDateTime.now());
@@ -156,7 +159,7 @@ public class SerialTransactionService {
             transactionRepository.save(transaction);
 
             sendLog("CONFIRM_UPDATE_SUPPLIER", "Serial updated successfully", ip, userAgent, loginId);
-            return ApiResponse.successWithMessage("Serial updated successfully");
+            return ApiResponse.success(updated.getSerialId().toString());
         } catch (Exception e) {
             sendLog("CONFIRM_UPDATE_SUPPLIER_FAIL", "Failed to confirm serial update: " + e.getMessage(), ip, userAgent, loginId);
             throw new RuntimeException("Failed to confirm serial update: " + e.getMessage(), e);
@@ -180,12 +183,12 @@ public class SerialTransactionService {
     }
 
     @Transactional
-    public ApiResponse<String> tryDeleteSerial(Long serialId, String ip, String userAgent, String loginId) {
+    public ApiResponse<String> tryDeleteSerial(String transactionId,Long serialId, String ip, String userAgent, String loginId) {
         try {
             Serial serial = serialRepository.findById(serialId)
                     .orElseThrow(() -> new RuntimeException("Serial not found"));
             String serialData = objectMapper.writeValueAsString(convertToDTO(serial));
-            String transactionId = createTransaction("DELETE", serialData, null);
+            createTransaction(transactionId, "DELETE", serialData, null);
             sendLog("TRY_DELETE_SUPPLIER", "Serial deletion prepared", ip, userAgent, loginId);
             return ApiResponse.success(transactionId);
         } catch (Exception e) {

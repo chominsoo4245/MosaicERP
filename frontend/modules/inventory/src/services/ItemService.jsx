@@ -1,7 +1,7 @@
 import api from "./api.jsx";
 
 export const getItemListAPI = async () => {
-    const response = await api.get(`/item-bff/aggregated`);
+    const response = await api.get(`/item-bff/getItemList`);
     return response.data;
 }
 
@@ -11,7 +11,7 @@ export const getItemAPI = async (id) => {
 }
 
 export const getFormInitDataAPI = async () => {
-    const response = await api.get("/item-bff/form-init");
+    const response = await api.get("/item-bff/formDataInit");
     return response.data;
 }
 

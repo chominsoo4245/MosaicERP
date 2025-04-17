@@ -42,4 +42,7 @@ public class InventoryHistory {
     private String originRef;
 
     private String operator;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

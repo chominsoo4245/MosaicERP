@@ -51,26 +51,6 @@ public class InventoryController {
         }
     }
 
-    @PostMapping("/increase")
-    public ApiResponse<InventoryDTO> increaseInventory(@RequestBody InventoryUpdateRequestDTO inventoryUpdateRequestDTO) {
-        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        try {
-            return inventoryService.increaseInventory(inventoryUpdateRequestDTO, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
-        } catch (Exception e) {
-            return ApiResponse.fail("Failed to increase inventory: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/decrease")
-    public ApiResponse<InventoryDTO> decreaseInventory(@RequestBody InventoryUpdateRequestDTO inventoryUpdateRequestDTO) {
-        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
-        try {
-            return inventoryService.decreaseInventory(inventoryUpdateRequestDTO, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getLoginId());
-        } catch (Exception e) {
-            return ApiResponse.fail("Failed to decrease inventory: " + e.getMessage());
-        }
-    }
-
     @GetMapping("/history")
     public ApiResponse<List<InventoryHistoryDTO>> getInventoryHistory(
             @RequestParam("itemId") Long itemId,
