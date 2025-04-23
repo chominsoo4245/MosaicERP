@@ -3,9 +3,9 @@ spring:
     name: warehouse-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/mosaicerp
-    username: mosaic
-    password: mosaic
+    url: jdbc:postgresql://localhost:10000/master_data
+    username: mosaic_master
+    password: master_db_pw
 
   kafka:
     bootstrap-servers: localhost:9092

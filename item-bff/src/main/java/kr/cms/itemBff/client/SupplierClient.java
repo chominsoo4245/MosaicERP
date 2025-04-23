@@ -26,4 +26,15 @@ public class SupplierClient extends AbstractApiClient{
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<ApiResponse<List<SupplierDTO>>>() {});
     }
+
+    public Mono<ApiResponse<SupplierDTO>> getSupplier(Integer defaultSupplierId, String ip, String userAgent, String loginId) {
+        String uri = "/supplier-service/" + defaultSupplierId;
+        return webclient.get()
+                .uri(uri)
+                .header("X-Forwarded-For", ip)
+                .header("X-User-Agent", userAgent)
+                .header("X-User-Id", loginId)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<ApiResponse<SupplierDTO>>() {});
+    }
 }

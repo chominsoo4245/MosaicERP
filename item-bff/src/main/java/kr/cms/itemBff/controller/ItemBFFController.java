@@ -4,10 +4,7 @@ import kr.cms.common.dto.ApiResponse;
 import kr.cms.common.dto.HeaderInfoDTO;
 import kr.cms.common.extractor.HeaderExtractor;
 import kr.cms.common.provider.HeaderProvider;
-import kr.cms.itemBff.dto.CreateItemRequest;
-import kr.cms.itemBff.dto.CreateItemResponse;
-import kr.cms.itemBff.dto.FormDataInitDTO;
-import kr.cms.itemBff.dto.ItemListResponseDTO;
+import kr.cms.itemBff.dto.*;
 import kr.cms.itemBff.service.ItemBFFService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +19,7 @@ public class ItemBFFController {
 
     private final ItemBFFService itemBffService;
     private final HeaderProvider headerProvider;
+    private final ItemBFFService itemBFFService;
 
     @GetMapping("/formDataInit")
     public Mono<ApiResponse<FormDataInitDTO>> getFormDataInit() {
@@ -30,7 +28,7 @@ public class ItemBFFController {
     }
 
     @GetMapping("/getItemList")
-    public Mono<ApiResponse<List<ItemListResponseDTO>>> getItemList() {
+    public Mono<ApiResponse<List<ItemResponseDTO>>> getItemList() {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         return itemBffService.getItemList(headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getIp());
     }
@@ -39,5 +37,11 @@ public class ItemBFFController {
     public Mono<ApiResponse<CreateItemResponse>> createItem(@RequestBody CreateItemRequest request) {
         HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
         return itemBffService.createItem(request, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getIp());
+    }
+
+    @GetMapping("/{itemId}")
+    public Mono<ApiResponse<ItemDetailDTO>> getItemDetail(@PathVariable Long itemId) {
+        HeaderInfoDTO headerInfoDTO = HeaderExtractor.extractHeaders(headerProvider, HeaderInfoDTO.class);
+        return itemBFFService.getItemDetail(itemId, headerInfoDTO.getIp(), headerInfoDTO.getUserAgent(), headerInfoDTO.getIp());
     }
 }

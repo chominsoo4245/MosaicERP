@@ -30,7 +30,7 @@ public class ItemBFFService {
     // log
     private final LogSender logSender;
 
-    public Mono<ApiResponse<List<ItemListResponseDTO>>> getItemList(String ip, String userAgent, String loginId) {
+    public Mono<ApiResponse<List<ItemResponseDTO>>> getItemList(String ip, String userAgent, String loginId) {
         logSender.sendLog("GET_ITEM_LIST_START", "Fetching item list", ip, userAgent, loginId);
 
         Mono<ApiResponse<List<ItemDTO>>> itemsMono = itemClient.getItemList(ip, userAgent, loginId);
@@ -63,12 +63,12 @@ public class ItemBFFService {
                     Map<Integer, String> supplierMap = suppliers.stream()
                             .collect(Collectors.toMap(SupplierDTO::getId, SupplierDTO::getName, (a, b) -> a));
 
-                    List<ItemListResponseDTO> resultList = items.stream()
+                    List<ItemResponseDTO> resultList = items.stream()
                             .map(item -> {
                                 String categoryName = categoryMap.getOrDefault(item.getCategoryId(), "미지정");
                                 String supplierName = supplierMap.getOrDefault(item.getDefaultSupplierId(), "미지정");
 
-                                return ItemListResponseDTO.builder()
+                                return ItemResponseDTO.builder()
                                         .itemId(item.getItemId())
                                         .code(item.getCode())
                                         .name(item.getName())
@@ -124,6 +124,52 @@ public class ItemBFFService {
             logSender.sendLog("GET_FORM_DATA_INIT_SUCCESS", "Successfully fetched form initialization data", ip, userAgent, loginId);
 
             return ApiResponse.success(new FormDataInitDTO(categories, warehouses, bins, suppliers));
+        });
+    }
+
+    public Mono<ApiResponse<ItemDetailDTO>> getItemDetail(Long itemId, String ip, String userAgent, String loginId) {
+        return itemClient.getItem(itemId, ip, userAgent, loginId).flatMap(itemResponse -> {
+            if(!itemResponse.isSuccess() || itemResponse.getData() == null) {
+                return Mono.just(ApiResponse.fail("Item not found"));
+            }
+
+            ItemDTO item = itemResponse.getData();
+
+            Mono<ApiResponse<CategoryDTO>> categoryMono = categoryClient.getCategory(item.getCategoryId(), ip, userAgent, loginId)
+                    .onErrorResume(e -> {
+                        logSender.sendLog("GET_CATEGORY_ERROR", "Error fetching category: " + e.getMessage(), ip, userAgent, loginId);
+                        return Mono.just(ApiResponse.success(new CategoryDTO()));
+                    });
+
+            Mono<ApiResponse<SupplierDTO>> supplierMono = item.getDefaultSupplierId() != null ?
+                    supplierClient.getSupplier(item.getDefaultSupplierId(), ip, userAgent, loginId)
+                            .onErrorResume(e -> {
+                                logSender.sendLog("GET_SUPPLIER_ERROR", "Error fetching supplier: " + e.getMessage(), ip, userAgent, loginId);
+                                return Mono.just(ApiResponse.success(new SupplierDTO()));
+                            }) :
+                    Mono.just(ApiResponse.success(new SupplierDTO()));
+
+            return Mono.zip(categoryMono, supplierMono).map(tuple -> {
+                System.out.println(tuple.getT1().getData());
+               CategoryDTO category = tuple.getT1().getData();
+               SupplierDTO supplier = tuple.getT2().getData();
+               ItemDetailDTO itemDetailDTO = ItemDetailDTO.builder()
+                       .itemId(item.getItemId())
+                       .code(item.getCode())
+                       .description(item.getDescription())
+                       .unit(item.getUnit())
+                       .cost(item.getCost())
+                       .price(item.getPrice())
+                       .isLotTracked(item.getIsLotTracked())
+                       .createdAt(item.getCreatedAt())
+                       .updatedAt(item.getUpdatedAt())
+                       .categoryId(item.getCategoryId())
+                       .categoryName(category != null ? category.getName() : "없음")
+                       .supplierId(item.getDefaultSupplierId())
+                       .supplierName(supplier != null ? supplier.getName() : "없음")
+                       .build();
+               return ApiResponse.success(itemDetailDTO);
+            });
         });
     }
 

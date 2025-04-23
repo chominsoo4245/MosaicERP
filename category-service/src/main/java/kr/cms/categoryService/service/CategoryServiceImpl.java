@@ -82,8 +82,8 @@ public class CategoryServiceImpl implements CategoryService {
         try {
             Category entity = convertToEntity(categoryDTO);
 
-            String autoShortCode = (entity.getParentId() != null)
-                    ? generateSubCategoryShortCode(entity.getParentId(), categoryDTO.getCategoryType())
+            String autoShortCode = (entity.getParentCategoryId() != null)
+                    ? generateSubCategoryShortCode(entity.getParentCategoryId(), categoryDTO.getCategoryType())
                     : getTopCategoryCode(categoryDTO.getCategoryType());
             entity.setShortCode(autoShortCode);
             // 생성 시간
@@ -137,7 +137,7 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryDTO convertToDTO(Category entity) {
         CategoryDTO dto = new CategoryDTO();
         dto.setId(entity.getId());
-        dto.setParentId(entity.getParentId());
+        dto.setParentId(entity.getParentCategoryId());
         dto.setCategoryType(entity.getCategoryType());
         dto.setCategoryCode(entity.getCategoryCode());
         dto.setShortCode(entity.getShortCode());
@@ -152,7 +152,7 @@ public class CategoryServiceImpl implements CategoryService {
     private Category convertToEntity(CategoryDTO dto) {
         Category entity = new Category();
         entity.setId(dto.getId());
-        entity.setParentId(dto.getParentId());
+        entity.setParentCategoryId(dto.getParentId());
         entity.setCategoryType(dto.getCategoryType());
         entity.setCategoryCode(dto.getCategoryCode());
         entity.setShortCode(dto.getShortCode());

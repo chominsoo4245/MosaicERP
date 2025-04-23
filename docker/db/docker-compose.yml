@@ -1,0 +1,70 @@
+version: "3.8"
+
+services:
+  master_data_db:
+    image: postgres:14
+    container_name: erp_master_db
+    environment:
+      POSTGRES_DB: master_data
+      POSTGRES_USER: mosaic_master
+      POSTGRES_PASSWORD: master_db_pw
+    ports:
+      - "10000:5432"
+    volumes:
+      - ./postgres-data/master:/var/lib/postgresql/data
+      - ./master:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - mosaic_erp_network
+
+  log_data_db:
+    image: postgres:14
+    container_name: erp_log_db
+    environment:
+      POSTGRES_DB: log_data
+      POSTGRES_USER: mosaic_log
+      POSTGRES_PASSWORD: log_db_pw
+    ports:
+      - "10001:5432"
+    volumes:
+      - ./postgres-data/log:/var/lib/postgresql/data
+      - ./logging:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - mosaic_erp_network
+
+  inventory_data_db:
+    image: postgres:14
+    container_name: erp_inventory_db
+    environment:
+      POSTGRES_DB: inventory_data
+      POSTGRES_USER: mosaic_inventory
+      POSTGRES_PASSWORD: inventory_db_pw
+    ports:
+      - "10002:5432"
+    volumes:
+      - ./postgres-data/inventory:/var/lib/postgresql/data
+      - ./inventory:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - mosaic_erp_network
+
+  user_data_db:
+    image: postgres:14
+    container_name: erp_user_db
+    environment:
+      POSTGRES_DB: user_data
+      POSTGRES_USER: mosaic_user
+      POSTGRES_PASSWORD: user_db_pw
+    ports:
+      - "10003:5432"
+    volumes:
+      - ./postgres-data/user:/var/lib/postgresql/data
+      - ./user:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - mosaic_erp_network
+
+networks:
+  mosaic_erp_network:
+    driver: bridge

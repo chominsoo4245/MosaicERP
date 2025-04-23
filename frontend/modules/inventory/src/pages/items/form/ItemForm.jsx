@@ -28,7 +28,7 @@ export default function ItemForm({ formData, onChange, categories = [], supplier
                 >
                     <option value="">-- 분류 선택 --</option>
                     {categories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>
+                        <option key={cat.id} value={cat.id} >
                             {cat.name}
                         </option>
                     ))}
@@ -45,7 +45,7 @@ export default function ItemForm({ formData, onChange, categories = [], supplier
                 >
                     <option value="">-- 공급업체 선택 --</option>
                     {suppliers.map((sup) => (
-                        <option key={sup.id} value={sup.id}>
+                        <option key={sup.id} value={sup.id} >
                             {sup.name}
                         </option>
                     ))}

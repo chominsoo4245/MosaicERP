@@ -30,4 +30,15 @@ public class CategoryClient extends AbstractApiClient{
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<ApiResponse<List<CategoryDTO>>>() {});
     }
+
+    public Mono<ApiResponse<CategoryDTO>> getCategory(Integer categoryId, String ip, String userAgent, String loginId) {
+        String uri = "/category-service/" + categoryId;
+        return webclient.get()
+                .uri(uri)
+                .header("X-Forwarded-For", ip)
+                .header("X-User-Agent", userAgent)
+                .header("X-User-Id", loginId)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<ApiResponse<CategoryDTO>>() {});
+    }
 }

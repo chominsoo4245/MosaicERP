@@ -3,9 +3,9 @@ spring:
     name: audit-log-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/mosaicerp
-    username: log_service_user
-    password: log_service_pw
+    url: jdbc:postgresql://localhost:10001/log_data
+    username: mosaic_log
+    password: log_db_pw
 
   kafka:
     bootstrap-servers: localhost:9092

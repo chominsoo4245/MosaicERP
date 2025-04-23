@@ -24,7 +24,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/item-bff/**",
                                 "/item-bff/aggregated",
-                                "/item-bff/form-init",
+                                "/item-bff/formDataInit",
                                 "/item-bff/add",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",

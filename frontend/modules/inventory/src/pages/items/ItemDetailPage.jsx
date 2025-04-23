@@ -4,15 +4,18 @@ import PageLayout from "../../components/Layout/PageLayout.jsx";
 import ButtonLayout from "../../components/Layout/ButtonLayout.jsx";
 import Tabs from "../../components/Tabs.jsx";
 import ItemForm from "./form/ItemForm.jsx";
-import { getItemAPI } from "../../services/ItemService.jsx";
+import {getFormInitDataAPI, getItemAPI} from "../../services/ItemService.jsx";
 
 export default function ItemDetailPage() {
-    const { id } = useParams(); // URL: /items/detail/:id
+    const { id } = useParams();
     const navigate = useNavigate();
     const [item, setItem] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState("basic");
+
+    const [categories, setCategories] = useState([]);
+    const [suppliers, setSuppliers] = useState([])
 
     const actions = [
         { label: "수정", type: "update", to: `/items/update/${id}` },
@@ -20,10 +23,30 @@ export default function ItemDetailPage() {
     ];
 
     useEffect(() => {
+        const getFormData = async () => {
+            try{
+                const response = await getFormInitDataAPI();
+                if(response.success) {
+                    setCategories(response.data.categories);
+                    setSuppliers(response.data.suppliers);
+                }else {
+                    setError(response.message || "분류코드, 공급업체를 불러오지 못했습니다.");
+                }
+            } catch (err) {
+                setError(err.message || "분류코드, 공급업체를 불러오지 못했습니다.")
+            }finally {
+                setLoading(false)
+            }
+        }
+        getFormData();
+    }, []);
+
+    useEffect(() => {
         const fetchItem = async () => {
             try {
                 const response = await getItemAPI(id);
                 if (response.success) {
+                    console.log(response.data);
                     setItem(response.data);
                 } else {
                     setError(response.message || "품목 상세 정보를 불러오는데 실패했습니다.");
@@ -65,7 +88,7 @@ export default function ItemDetailPage() {
             ]}>
                 {activeTab === "basic" && (
                     // 상세 조회의 경우, mode="detail"이면 폼 내 자동 생성 필드는 읽기 전용으로 노출
-                    <ItemForm formData={item} onChange={() => {}} readOnly mode="detail" />
+                    <ItemForm formData={item} categories={categories} suppliers={suppliers} onChange={() => {}} readOnly mode="detail" />
                 )}
                 {activeTab === "inventory" && (
                     <div>

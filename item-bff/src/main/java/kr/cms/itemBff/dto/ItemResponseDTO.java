@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemListResponseDTO {
+public class ItemResponseDTO {
     private Long itemId;           // 품목 ID
     private String code;           // 품목 코드
     private String name;           // 품목 명
